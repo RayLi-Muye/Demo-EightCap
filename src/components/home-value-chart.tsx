@@ -1,5 +1,7 @@
 import { Eye, ScanLine } from "lucide-react-native";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Text, View, useWindowDimensions } from "react-native";
+import Animated, { FadeInUp, LinearTransition } from "react-native-reanimated";
 
 import { accountSummary, homeCurve } from "@/data/portfolio";
 import { colors, spacing } from "@/design/theme";
@@ -10,9 +12,30 @@ import { Sparkline } from "./sparkline";
 export function HomeValueChart() {
   const { width } = useWindowDimensions();
   const chartWidth = Math.min(width, 520);
+  const [curve, setCurve] = useState(homeCurve);
+  const tickRef = useRef(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      tickRef.current += 1;
+      setCurve((currentCurve) => {
+        const last = currentCurve[currentCurve.length - 1] ?? 62;
+        const delta = Math.sin(tickRef.current * 1.43) * 0.9 + 0.22;
+        return [...currentCurve.slice(1), Math.max(last + delta, 34)];
+      });
+    }, 3400);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const liveValue = useMemo(() => {
+    const startingPoint = homeCurve[homeCurve.length - 1] ?? 62;
+    const currentPoint = curve[curve.length - 1] ?? startingPoint;
+    return accountSummary.totalValue + (currentPoint - startingPoint) * 18;
+  }, [curve]);
 
   return (
-    <View style={{ gap: spacing.xl, marginHorizontal: -spacing.lg }}>
+    <Animated.View entering={FadeInUp.duration(560).springify()} layout={LinearTransition.duration(300)} style={{ gap: spacing.xl, marginHorizontal: -spacing.lg }}>
       <View style={{ gap: spacing.md, paddingHorizontal: spacing.lg }}>
         <View style={{ flexDirection: "row", justifyContent: "space-between", gap: spacing.md }}>
           <View style={{ flex: 1, gap: spacing.xs }}>
@@ -26,7 +49,7 @@ export function HomeValueChart() {
                 adjustsFontSizeToFit
                 style={{ color: colors.ink, fontSize: 48, fontVariant: ["tabular-nums"], fontWeight: "900", letterSpacing: 0 }}
               >
-                {formatCurrency(accountSummary.totalValue)}
+                {formatCurrency(liveValue)}
               </Text>
               <Eye color={colors.muted} size={22} strokeWidth={2.3} />
             </View>
@@ -59,7 +82,7 @@ export function HomeValueChart() {
 
       <View style={{ height: 210, width: "100%" }}>
         <Sparkline
-          values={homeCurve}
+          values={curve}
           color={colors.brandAction}
           fillArea
           height={210}
@@ -68,6 +91,6 @@ export function HomeValueChart() {
           showGuide={false}
         />
       </View>
-    </View>
+    </Animated.View>
   );
 }

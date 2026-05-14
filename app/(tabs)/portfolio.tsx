@@ -1,16 +1,22 @@
+import * as Haptics from "expo-haptics";
 import { ChartColumn, ChevronDown, Coins, EllipsisVertical, Settings2 } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
 
 import { AppHeader } from "@/components/app-header";
+import { GlassSurface } from "@/components/glass-surface";
 import { HoldingRow } from "@/components/holding-row";
 import { ScreenScroll } from "@/components/screen-scroll";
 import { accountSummary, holdings } from "@/data/portfolio";
 import { colors, radius, shadows, spacing } from "@/design/theme";
+import { useLiveHoldings } from "@/hooks/use-live-market";
 import { formatCurrency, formatSignedCurrency } from "@/utils/format";
 
 const filters = ["挂单", "交易", "开盘", "股票"];
 
 export default function PortfolioScreen() {
+  const live = useLiveHoldings(holdings);
+
   return (
     <ScreenScroll includeTopInset bottomInset={110}>
       <AppHeader
@@ -18,7 +24,7 @@ export default function PortfolioScreen() {
         centerSubLabel={formatSignedCurrency(-13.83)}
       />
 
-      <View style={{ gap: spacing.xl }}>
+      <Animated.View entering={FadeInUp.duration(520).springify()} style={{ gap: spacing.xl }}>
         <View style={{ alignItems: "center", flexDirection: "row", justifyContent: "space-between", gap: spacing.md }}>
           <View style={{ alignItems: "center", flexDirection: "row", flex: 1, gap: spacing.sm }}>
             <Text selectable numberOfLines={1} adjustsFontSizeToFit style={{ color: colors.ink, fontSize: 31, fontWeight: "900" }}>
@@ -36,8 +42,9 @@ export default function PortfolioScreen() {
 
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.md }}>
           {filters.map((filter) => (
-            <View
+            <Pressable
               key={filter}
+              onPress={() => Haptics.selectionAsync().catch(() => {})}
               style={{
                 borderColor: "#c9ceda",
                 borderRadius: radius.full,
@@ -49,10 +56,10 @@ export default function PortfolioScreen() {
               <Text selectable style={{ color: colors.muted, fontSize: 18, fontWeight: "800" }}>
                 {filter}
               </Text>
-            </View>
+            </Pressable>
           ))}
         </View>
-      </View>
+      </Animated.View>
 
       <View style={{ backgroundColor: colors.surface, marginHorizontal: -spacing.lg }}>
         <View
@@ -65,7 +72,7 @@ export default function PortfolioScreen() {
           }}
         >
           <Text selectable style={{ color: colors.muted, fontSize: 18, fontWeight: "900", width: 150 }}>
-            资产 ({holdings.length})
+            资产 ({live.holdings.length})
           </Text>
           <Text selectable style={{ color: "#1597e5", fontSize: 18, fontWeight: "900", textAlign: "right", width: 56 }}>
             变动▲
@@ -78,8 +85,8 @@ export default function PortfolioScreen() {
           </Text>
         </View>
 
-        {holdings.map((holding) => (
-          <HoldingRow key={holding.symbol} holding={holding} />
+        {live.holdings.map((holding) => (
+          <HoldingRow key={holding.symbol} holding={holding} pulse={live.pulses[holding.symbol]} />
         ))}
       </View>
 
@@ -96,22 +103,36 @@ export default function PortfolioScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Deposit funds"
+          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {})}
           style={({ pressed }) => ({
             ...shadows.card,
             alignItems: "center",
-            backgroundColor: colors.brandAction,
             borderRadius: radius.full,
             flexDirection: "row",
             gap: spacing.sm,
             justifyContent: "center",
             minWidth: 132,
             opacity: pressed ? 0.72 : 1,
-            paddingHorizontal: spacing.xl,
-            paddingVertical: spacing.md,
           })}
         >
-          <Coins color={colors.inverse} size={21} strokeWidth={2.4} />
-          <Text style={{ color: colors.inverse, fontSize: 20, fontWeight: "900" }}>入金</Text>
+          <GlassSurface
+            interactive
+            tintColor="rgba(5,184,63,0.82)"
+            style={{
+              alignItems: "center",
+              backgroundColor: colors.brandAction,
+              borderRadius: radius.full,
+              flexDirection: "row",
+              gap: spacing.sm,
+              justifyContent: "center",
+              minWidth: 132,
+              paddingHorizontal: spacing.xl,
+              paddingVertical: spacing.md,
+            }}
+          >
+            <Coins color={colors.inverse} size={21} strokeWidth={2.4} />
+            <Text style={{ color: colors.inverse, fontSize: 20, fontWeight: "900" }}>入金</Text>
+          </GlassSurface>
         </Pressable>
       </View>
     </ScreenScroll>

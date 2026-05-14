@@ -1,8 +1,11 @@
+import * as Haptics from "expo-haptics";
 import { ArrowRightLeft, Landmark, Plus, Smartphone } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
+import Animated, { FadeInUp } from "react-native-reanimated";
 
 import { AccountSummaryCard } from "@/components/account-summary-card";
 import { AppHeader } from "@/components/app-header";
+import { GlassSurface } from "@/components/glass-surface";
 import { ScreenScroll } from "@/components/screen-scroll";
 import { walletAccounts } from "@/data/portfolio";
 import { colors, radius, shadows, spacing } from "@/design/theme";
@@ -15,7 +18,8 @@ export default function WalletScreen() {
 
       <AccountSummaryCard />
 
-      <View
+      <GlassSurface
+        interactive
         style={{
           backgroundColor: colors.surface,
           borderRadius: radius.md,
@@ -34,6 +38,7 @@ export default function WalletScreen() {
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Start funding"
+            onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {})}
             style={({ pressed }) => ({
               alignItems: "center",
               alignSelf: "flex-start",
@@ -61,11 +66,12 @@ export default function WalletScreen() {
         >
           <Smartphone color={colors.brandAction} size={60} strokeWidth={1.7} />
         </View>
-      </View>
+      </GlassSurface>
 
       <View style={{ backgroundColor: colors.surface, marginHorizontal: -spacing.lg }}>
-        {walletAccounts.map((account) => (
-          <View
+        {walletAccounts.map((account, index) => (
+          <Animated.View
+            entering={FadeInUp.delay(index * 90).duration(430).springify()}
             key={account.code}
             style={{
               borderBottomColor: colors.line,
@@ -108,7 +114,7 @@ export default function WalletScreen() {
                 {account.code === "USD" ? "$" : account.code === "AUD" ? "A$" : "£"}{account.balance.toFixed(2)}
               </Text>
             </View>
-          </View>
+          </Animated.View>
         ))}
       </View>
 
@@ -123,6 +129,7 @@ export default function WalletScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Deposit funds"
+          onPress={() => Haptics.selectionAsync().catch(() => {})}
           style={({ pressed }) => ({
             alignItems: "center",
             borderColor: colors.line,
@@ -143,6 +150,7 @@ export default function WalletScreen() {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Transfer funds"
+          onPress={() => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {})}
           style={({ pressed }) => ({
             ...shadows.card,
             alignItems: "center",

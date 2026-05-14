@@ -5,9 +5,12 @@ import { accountSummary } from "@/data/portfolio";
 import { colors, radius, shadows, spacing } from "@/design/theme";
 import { formatCurrency } from "@/utils/format";
 
+import { GlassSurface } from "./glass-surface";
+
 export function AccountSummaryCard() {
   return (
-    <View
+    <GlassSurface
+      interactive
       style={{
         ...shadows.card,
         backgroundColor: colors.surface,
@@ -66,6 +69,6 @@ export function AccountSummaryCard() {
           投资账户
         </Text>
       </View>
-    </View>
+    </GlassSurface>
   );
 }

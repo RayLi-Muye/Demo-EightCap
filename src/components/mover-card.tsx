@@ -1,15 +1,17 @@
 import { ArrowDown, ArrowUp, EllipsisVertical } from "lucide-react-native";
 import { Text, View } from "react-native";
+import Animated, { FadeInUp, ZoomIn } from "react-native-reanimated";
 
 import { movers } from "@/data/portfolio";
 import { colors, radius, shadows, spacing } from "@/design/theme";
 import { formatPercent } from "@/utils/format";
 
 import { AssetLogo } from "./asset-logo";
+import { GlassSurface } from "./glass-surface";
 
 export function MoverCard() {
   return (
-    <View
+    <GlassSurface
       style={{
         ...shadows.card,
         backgroundColor: colors.surface,
@@ -39,11 +41,16 @@ export function MoverCard() {
         {movers.map((mover, index) => {
           const barHeight = Math.max(52, mover.value * 96);
           return (
-            <View key={mover.symbol} style={{ alignItems: "center", gap: spacing.sm, opacity: index === 2 ? 0.42 : 1 }}>
+            <Animated.View
+              entering={FadeInUp.delay(index * 110).duration(520).springify()}
+              key={mover.symbol}
+              style={{ alignItems: "center", gap: spacing.sm, opacity: index === 2 ? 0.42 : 1 }}
+            >
               <Text selectable style={{ color: colors.positive, fontSize: 18, fontVariant: ["tabular-nums"], fontWeight: "900" }}>
                 {formatPercent(mover.value)}
               </Text>
-              <View
+              <Animated.View
+                entering={ZoomIn.delay(index * 130).duration(420).springify()}
                 style={{
                   backgroundColor: index === 2 ? colors.line : colors.brandAction,
                   borderRadius: 8,
@@ -55,10 +62,10 @@ export function MoverCard() {
               <Text selectable style={{ color: colors.muted, fontSize: 14, fontWeight: "900" }}>
                 {mover.symbol}
               </Text>
-            </View>
+            </Animated.View>
           );
         })}
       </View>
-    </View>
+    </GlassSurface>
   );
 }

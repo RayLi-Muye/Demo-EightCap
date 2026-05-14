@@ -108,6 +108,40 @@ npm run typecheck
 npx expo export --platform web
 ```
 
+### SDK 55 Native-First Visual Upgrade
+
+The user confirmed the upgrade target should be Expo SDK 55 stable, with native-first visual polish rather than implementing every new SDK 55 feature for its own sake. The agreed focus:
+
+- Four primary tabs should feel visually consistent and active.
+- Liquid Glass direction should continue across native tabs, cards, CTA surfaces, and detail actions.
+- Mock market data should keep moving during demo review.
+- Watchlist and portfolio rows should flash green/red on price updates.
+- Home index strip should continuously scroll like a market ticker.
+- Instrument detail should be included as a polished fifth screen because asset rows need a credible destination.
+
+Commands used:
+
+```bash
+npx expo install expo@latest
+npx expo install --fix
+npx expo install expo-glass-effect expo-symbols
+npm install --save-dev react-test-renderer@19.2.0
+npx expo-doctor
+npm uninstall @expo/vector-icons
+npm run typecheck
+```
+
+Implementation notes:
+
+- Upgraded `expo` to SDK 55 and `expo-router` to the SDK 55-compatible package line.
+- Removed obsolete SDK 55 config fields: `newArchEnabled` and Android `edgeToEdgeEnabled`.
+- Migrated `NativeTabs` to SDK 55 static child components: `NativeTabs.Trigger.Icon`, `Label`, and `Badge`.
+- Added `expo-glass-effect` for native Liquid Glass readiness and `GlassSurface` for iOS/web/native fallbacks.
+- Added `expo-symbols` and removed the unused `@expo/vector-icons` dependency.
+- Added `useLiveAssets`, `useLiveHoldings`, and `useLiveIndexes` to simulate market ticks.
+- Added Apple Zoom Link wrappers around asset rows and a matching `Link.AppleZoomTarget` on instrument detail.
+- Added `Stack.Toolbar` actions on instrument detail as a native toolbar pilot.
+
 ### Figma Wireframe Creation
 
 ```text

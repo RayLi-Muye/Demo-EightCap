@@ -1,8 +1,11 @@
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import * as SplashScreen from "expo-splash-screen";
 import { Stack } from "expo-router/stack";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import 'react-native-reanimated';
 
+import { LaunchSplash } from "@/components/launch-splash";
 import { colors } from "@/design/theme";
 
 export {
@@ -25,7 +28,13 @@ const navigationTheme = {
   },
 };
 
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
 export default function RootLayout() {
+  useEffect(() => {
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
+
   return (
     <ThemeProvider value={navigationTheme}>
       <Stack
@@ -45,6 +54,7 @@ export default function RootLayout() {
         <Stack.Screen name="disclaimer" options={{ title: "Demo Notice", presentation: "modal" }} />
       </Stack>
       <StatusBar style="dark" />
+      <LaunchSplash />
     </ThemeProvider>
   );
 }

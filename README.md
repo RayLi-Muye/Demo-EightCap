@@ -11,7 +11,9 @@ This repository is being prepared as an interview demonstration. The app will us
 - Figma wireframes: created in `Eightcap Market Demo - Wireframes`, with basic prototype navigation wired
 - Prompt and command log: started in `docs/prompt-command-log.md`
 - App implementation: Tradle-inspired four-tab account experience is running locally
-- Navigation polish: native tabs are used on iOS/Android for system tab behavior, with a glassy blur fallback for web demo links
+- SDK baseline: upgraded to Expo SDK 55 stable
+- Navigation polish: SDK 55 native tabs are used on iOS/Android for system tab behavior, with a glassy blur fallback for web demo links
+- Motion system: mocked market data streams drive live quote flashes, animated index ticker, haptics, launch animation, and detail-page zoom transitions
 - Data source: local mock data only
 - API routes: intentionally not used in this phase
 
@@ -81,6 +83,7 @@ This is a portfolio demo only. It should be described as "inspired by Eightcap's
 - Wallet tab with total value, currency selector, account balances, and transfer/deposit actions.
 - Instrument detail route with chart range controls, bid/ask stats, spread, and market state.
 - Bottom navigation with native tab treatment on mobile and a translucent blur treatment on web.
+- Realtime-style mock updates across Home, My Investments, Watchlist, and Instrument Detail.
 
 ## Verification
 

@@ -167,9 +167,19 @@ Recommended stack:
 Expo Router 7 / SDK 55 direction:
 
 - Native tabs are the right bottom navigation direction for this app because the demo is mobile-first and iOS 26+ can render the system Liquid Glass tab bar.
-- Stack Toolbar, Apple Zoom transitions, Data Loaders / SSR, Material 3 dynamic colors, the new error overlay, and Split View are good follow-up migration items after the SDK 55 upgrade.
-- Do not mix every new SDK 55 feature into the first demo pass. Keep the current app focused on the four product tabs, instrument detail route, visual polish, and reliable web deployment.
+- Stack Toolbar and Apple Zoom transitions should be used where they strengthen the native app feel: asset rows into instrument detail and detail-page header actions.
+- Material 3 direction should show through Android native tab indicator/ripple colors and consistent green status tokens.
+- Data Loaders / SSR and Split View are follow-up architecture items. They are not required while market data is deterministic and local.
+- Keep the current app focused on the four product tabs, instrument detail route, visual polish, and reliable web deployment.
 - For interview delivery, explain that web receives a blur fallback while native builds can use platform-native tab rendering.
+
+Motion / realtime mock direction:
+
+- Home: account value and chart should shift subtly while the index strip loops horizontally.
+- Watchlist: update two to three quote rows every few seconds; flash green for upticks and red for downticks.
+- My Investments: update fewer rows at a slower cadence so the portfolio still feels readable.
+- Wallet: keep balances stable; use glass surfaces, card entry motion, and haptic CTA feedback instead of changing money values.
+- Instrument Detail: update the selected asset more frequently, animate chart values, and support Apple Zoom transition from asset rows.
 
 API route decision:
 
