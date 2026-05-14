@@ -11,7 +11,7 @@ Use this document as the starting point for Figma wireframes and a clickable pro
 - File name: `Eightcap Market Demo - Wireframes`
 - URL: https://www.figma.com/design/CsK2FHAqyu4bmOkiXTmkGp
 - Pages: `00 Cover`, `01 Wireframes`, `02 Components`
-- Status: mobile-first wireframes created and visually checked against standard phone and tablet-web preview frames.
+- Status: mobile-first wireframes created, basic prototype navigation wired, and visually checked against standard phone and tablet-web preview frames.
 
 ## Frames
 
@@ -71,6 +71,14 @@ Use this document as the starting point for Figma wireframes and a clickable pro
 5. Add/remove from watchlist.
 6. Open Insights.
 7. Open Disclaimer.
+
+Implemented prototype links:
+
+- Market Home rows `XAUUSD` and `EURUSD` navigate to Instrument Detail.
+- Watchlist row `XAUUSD` navigates to Instrument Detail.
+- Header info icons navigate to Disclaimer.
+- Disclaimer CTA returns to Market Home.
+- Bottom tab hotspots navigate between Markets, Watchlist, and Insights.
 
 ## Copy Guidelines
 

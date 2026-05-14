@@ -86,7 +86,14 @@ Main frames: Market Home, Instrument Detail, Watchlist, Insights, Disclaimer, Sm
 
 Figma generation used the `figma-use` and `figma-generate-design` workflows. The file includes local color/text styles, reusable component references, mobile-first screen frames, a small-phone adaptation, and a tablet/web preview with reviewer notes.
 
-The generated wireframes were checked through Figma metadata inspection and screenshots of the standard phone and tablet-web preview frames.
+Basic prototype navigation was added with Figma reaction hotspots:
+
+- Market rows to Instrument Detail.
+- Header info icons to Disclaimer.
+- Disclaimer CTA back to Market Home.
+- Bottom tabs between Markets, Watchlist, and Insights.
+
+The generated wireframes were checked through Figma metadata inspection and screenshots of the standard phone and tablet-web preview frames. After prototype links were added, the Market Home frame was screenshot-checked again to confirm transparent hotspots did not alter the UI.
 
 The web app was opened and checked in the Codex in-app browser at:
 

@@ -8,7 +8,7 @@ This repository is being prepared as an interview demonstration. The app will us
 
 - Repository scaffold: created and pushed to private GitHub repo
 - Design brief: drafted in `docs/eightcap-mobile-demo-brief.md`
-- Figma wireframes: created in `Eightcap Market Demo - Wireframes`
+- Figma wireframes: created in `Eightcap Market Demo - Wireframes`, with basic prototype navigation wired
 - Prompt and command log: started in `docs/prompt-command-log.md`
 - App implementation: Expo Router + TypeScript first pass is running locally
 - Data source: local mock data only
