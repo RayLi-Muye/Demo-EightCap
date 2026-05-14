@@ -6,6 +6,13 @@ Date: 2026-05-14
 
 Use this document as the starting point for Figma wireframes and a clickable prototype before implementation.
 
+## Figma File
+
+- File name: `Eightcap Market Demo - Wireframes`
+- URL: https://www.figma.com/design/CsK2FHAqyu4bmOkiXTmkGp
+- Pages: `00 Cover`, `01 Wireframes`, `02 Components`
+- Status: mobile-first wireframes created and visually checked against standard phone and tablet-web preview frames.
+
 ## Frames
 
 - `01 Market Home / iPhone 15`
@@ -15,6 +22,15 @@ Use this document as the starting point for Figma wireframes and a clickable pro
 - `05 Disclaimer / iPhone 15`
 - `06 Market Home / Small Phone`
 - `07 Market Home / Tablet-Web Preview`
+
+## Created Component References
+
+- App header with search and market status.
+- Segmented control.
+- Instrument row with symbol, name, price, change, spread, and sparkline.
+- Stat tile.
+- Insight card.
+- Disclosure/risk notice.
 
 ## Components To Design First
 
@@ -62,4 +78,3 @@ Use this document as the starting point for Figma wireframes and a clickable pro
 - Label the app as a demo where trading-like content appears.
 - Avoid official Eightcap claims or regulated product promises.
 - Do not present mock data as live data.
-

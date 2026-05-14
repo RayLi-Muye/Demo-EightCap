@@ -8,6 +8,7 @@ This repository is being prepared as an interview demonstration. The app will us
 
 - Repository scaffold: created and pushed to private GitHub repo
 - Design brief: drafted in `docs/eightcap-mobile-demo-brief.md`
+- Figma wireframes: created in `Eightcap Market Demo - Wireframes`
 - Prompt and command log: started in `docs/prompt-command-log.md`
 - App implementation: Expo Router + TypeScript first pass is running locally
 - Data source: local mock data only
@@ -33,7 +34,7 @@ Port `8081` was already occupied on this machine, so `8082` was used for verific
 The strongest interview package should include:
 
 1. A live web demo link generated from the Expo web build and deployed to Vercel.
-2. A Figma prototype link showing the mobile wireframes and visual system.
+2. A Figma prototype link showing the mobile wireframes and visual system: https://www.figma.com/design/CsK2FHAqyu4bmOkiXTmkGp
 3. This GitHub repository link for code review.
 4. A short case-study note in the email explaining scope, tradeoffs, and what is mocked.
 

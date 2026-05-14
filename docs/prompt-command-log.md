@@ -75,6 +75,19 @@ npm run typecheck
 npx expo export --platform web
 ```
 
+### Figma Wireframe Creation
+
+```text
+Figma file created: Eightcap Market Demo - Wireframes
+Figma URL: https://www.figma.com/design/CsK2FHAqyu4bmOkiXTmkGp
+Pages created: 00 Cover, 01 Wireframes, 02 Components
+Main frames: Market Home, Instrument Detail, Watchlist, Insights, Disclaimer, Small Phone Home, Tablet-Web Preview
+```
+
+Figma generation used the `figma-use` and `figma-generate-design` workflows. The file includes local color/text styles, reusable component references, mobile-first screen frames, a small-phone adaptation, and a tablet/web preview with reviewer notes.
+
+The generated wireframes were checked through Figma metadata inspection and screenshots of the standard phone and tablet-web preview frames.
+
 The web app was opened and checked in the Codex in-app browser at:
 
 ```text
