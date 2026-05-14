@@ -1,3 +1,4 @@
+import { BlurView } from "expo-blur";
 import { Tabs } from "expo-router";
 import { ChartPie, Eye, House, Wallet } from "lucide-react-native";
 
@@ -10,6 +11,16 @@ export default function TabLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.brandAction,
         tabBarInactiveTintColor: colors.muted,
+        tabBarBackground: () => (
+          <BlurView
+            tint="systemUltraThinMaterial"
+            intensity={86}
+            style={{
+              backgroundColor: "rgba(255,255,255,0.62)",
+              flex: 1,
+            }}
+          />
+        ),
         tabBarItemStyle: {
           flex: 1,
           minWidth: 0,
@@ -17,11 +28,14 @@ export default function TabLayout() {
         tabBarLabelStyle: { fontSize: 12, fontWeight: "700" },
         tabBarLabelPosition: "below-icon",
         tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: colors.line,
+          backgroundColor: "rgba(255,255,255,0.58)",
+          borderTopColor: "rgba(230,234,240,0.55)",
           height: 88,
+          overflow: "hidden",
           paddingBottom: 22,
           paddingTop: 8,
+          position: "absolute",
+          boxShadow: "0 -14px 32px rgba(8, 11, 18, 0.08)",
         },
       }}
     >

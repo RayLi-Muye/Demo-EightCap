@@ -156,11 +156,20 @@ Recommended stack:
 
 - Expo + React Native + TypeScript.
 - Expo Router for screens.
+- Expo Router native tabs on iOS/Android for platform tab behavior and iOS Liquid Glass readiness.
+- Expo Blur fallback for the shareable web build, where there is no system Liquid Glass tab bar.
 - Local mock data first.
 - Expo web build for shareable demo deployment.
 - Vercel for live email link.
 - Figma for wireframes, tokens, and prototype flow.
 - API routes are not needed for the current mock-data phase.
+
+Expo Router 7 / SDK 55 direction:
+
+- Native tabs are the right bottom navigation direction for this app because the demo is mobile-first and iOS 26+ can render the system Liquid Glass tab bar.
+- Stack Toolbar, Apple Zoom transitions, Data Loaders / SSR, Material 3 dynamic colors, the new error overlay, and Split View are good follow-up migration items after the SDK 55 upgrade.
+- Do not mix every new SDK 55 feature into the first demo pass. Keep the current app focused on the four product tabs, instrument detail route, visual polish, and reliable web deployment.
+- For interview delivery, explain that web receives a blur fallback while native builds can use platform-native tab rendering.
 
 API route decision:
 

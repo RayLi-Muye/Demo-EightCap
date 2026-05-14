@@ -11,6 +11,7 @@ This repository is being prepared as an interview demonstration. The app will us
 - Figma wireframes: created in `Eightcap Market Demo - Wireframes`, with basic prototype navigation wired
 - Prompt and command log: started in `docs/prompt-command-log.md`
 - App implementation: Tradle-inspired four-tab account experience is running locally
+- Navigation polish: native tabs are used on iOS/Android for system tab behavior, with a glassy blur fallback for web demo links
 - Data source: local mock data only
 - API routes: intentionally not used in this phase
 
@@ -52,6 +53,8 @@ This is a portfolio demo only. It should be described as "inspired by Eightcap's
 .
 ├── app/                    Expo Router screens
 │   ├── (tabs)/             Home, Portfolio, Watchlist, Wallet
+│   │   └── _layout.native.tsx
+│   │                       NativeTabs layout for iOS/Android
 │   ├── instrument/         Dynamic instrument detail route
 │   └── disclaimer.tsx      Secondary project boundary note
 ├── assets/                 Expo app assets
@@ -77,6 +80,7 @@ This is a portfolio demo only. It should be described as "inspired by Eightcap's
 - Watchlist tab with search, chips, quote table, bid/ask capsules, and add CTA.
 - Wallet tab with total value, currency selector, account balances, and transfer/deposit actions.
 - Instrument detail route with chart range controls, bid/ask stats, spread, and market state.
+- Bottom navigation with native tab treatment on mobile and a translucent blur treatment on web.
 
 ## Verification
 

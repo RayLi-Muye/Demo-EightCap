@@ -75,6 +75,39 @@ npm run typecheck
 npx expo export --platform web
 ```
 
+### Liquid Glass Navigation Pass
+
+The user asked whether the bottom navigation could use a Liquid Glass effect and listed Expo Router v7 / SDK 55-era features: native toolbars, zoom transitions, data loaders and SSR, Material 3 colors, new error overlay, and Split View Controller beta.
+
+Research checked against Expo's current documentation:
+
+- Expo Router Native Tabs: https://docs.expo.dev/router/advanced/native-tabs/
+- Native tabs API reference: https://docs.expo.dev/versions/latest/sdk/router/native-tabs/
+- Expo SDK 55 changelog: https://expo.dev/changelog/sdk-55
+- Stack Toolbar: https://docs.expo.dev/router/advanced/stack-toolbar/
+- Zoom transition: https://docs.expo.dev/router/advanced/zoom-transition/
+- Data loaders: https://docs.expo.dev/router/web/data-loaders/
+- Split View: https://docs.expo.dev/versions/v55.0.0/sdk/router-split-view/
+
+Decision:
+
+- Keep the project on its current Expo SDK 54 / Expo Router 6 line for this pass to avoid a broad dependency migration during visual implementation.
+- Add `expo-blur` for the shareable web preview and JavaScript tab fallback.
+- Add `app/(tabs)/_layout.native.tsx` using `expo-router/unstable-native-tabs` so native builds use platform-native tabs. This creates the correct route structure for iOS 26+ Liquid Glass behavior while keeping web stable.
+- Treat the wider SDK 55 feature list as a planned migration, not required for the first interview demo link.
+
+Commands used:
+
+```bash
+npm view expo-router version
+npm view expo version
+npm view expo-glass-effect version
+npm view expo-blur version
+npx expo install expo-blur
+npm run typecheck
+npx expo export --platform web
+```
+
 ### Figma Wireframe Creation
 
 ```text
