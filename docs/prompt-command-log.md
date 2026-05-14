@@ -31,6 +31,18 @@ curl -L -s 'https://www.eightcap.com/_next/static/css/ac6eceaa8113dd94.css?dpl=d
 curl -L -s 'https://www.eightcap.com/_next/static/css/da6512f5b0afe8ea.css?dpl=dpl_3MNkQHG9dsRkCyyLCLZMA4kWGtn6' | rg -o '#[0-9A-Fa-f]{3,8}' | sort | uniq | head -120
 curl -L -s 'https://www.eightcap.com/_next/static/css/5e51ac8edf0f9e07.css?dpl=dpl_3MNkQHG9dsRkCyyLCLZMA4kWGtn6' | rg -n 'bg-utility-brand|bg-icon-brand|bg-audience-traders|fg-text-default-black|glass-effect|banner-gradient' -C 1
 mkdir -p docs
+git config --global user.name
+git config --global user.email
+gh api user --jq '{login: .login, id: .id, name: .name, email: .email}'
+git init -b main
+git config user.name RayLi
+git config user.email 161552348+RayLi-Muye@users.noreply.github.com
+git add README.md docs/eightcap-mobile-demo-brief.md docs/figma-wireframe-brief.md docs/prompt-command-log.md .gitignore
+git commit -m "Initialize Eightcap demo brief"
+gh repo create Demo-EightCap --private --source=. --remote=origin --push --description "React Native market browsing demo inspired by Eightcap"
+git status --short --branch
+git remote -v
+gh repo view RayLi-Muye/Demo-EightCap --json nameWithOwner,url,visibility,description,defaultBranchRef
 ```
 
 ## Notes
@@ -39,6 +51,8 @@ mkdir -p docs
 - `RayLi-Muye/Demo-EightCap` did not exist when checked.
 - The current directory was initially empty and not a Git repository.
 - One CSS variable extraction command failed because the pattern began with `--`; it should use `rg -- 'pattern'` if repeated.
+- A private GitHub repository was created at https://github.com/RayLi-Muye/Demo-EightCap.
+- The local `main` branch tracks `origin/main`.
 
 ## Future Prompt Templates
 
@@ -59,4 +73,3 @@ Scaffold an Expo Router + TypeScript React Native app for the Eightcap Market De
 ```text
 Review the React Native implementation against the design brief, focusing on responsive layout, mock-data clarity, component boundaries, accessibility, and whether the demo is safe to send as an interview link.
 ```
-

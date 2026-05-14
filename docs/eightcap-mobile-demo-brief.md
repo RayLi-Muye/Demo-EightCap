@@ -182,8 +182,7 @@ Secondary options:
 
 ## Open Decisions
 
-- Final repo visibility: private during build, public or shared later for interview review.
+- Final repo visibility: currently private during build; make public or invite reviewers later for interview review.
 - Whether the deployed app should use a neutral name like `Market Pulse Demo` to avoid brand confusion.
 - Whether to include generated visual assets or use abstract chart/product visuals.
 - Chart library choice after Expo scaffold is created.
-

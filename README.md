@@ -6,7 +6,7 @@ This repository is being prepared as an interview demonstration. The app will us
 
 ## Current Status
 
-- Repository scaffold: in progress
+- Repository scaffold: created and pushed to private GitHub repo
 - Design brief: drafted in `docs/eightcap-mobile-demo-brief.md`
 - Prompt and command log: started in `docs/prompt-command-log.md`
 - App implementation: not started yet
@@ -51,4 +51,3 @@ src/features/        Feature-level modules
 src/utils/           Formatting and shared utilities
 assets/              Images, icons, and generated visuals
 ```
-
