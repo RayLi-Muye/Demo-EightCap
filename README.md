@@ -10,7 +10,7 @@ This repository is being prepared as an interview demonstration. The app will us
 - Design brief: drafted in `docs/eightcap-mobile-demo-brief.md`
 - Figma wireframes: created in `Eightcap Market Demo - Wireframes`, with basic prototype navigation wired
 - Prompt and command log: started in `docs/prompt-command-log.md`
-- App implementation: Expo Router + TypeScript first pass is running locally
+- App implementation: Tradle-inspired four-tab account experience is running locally
 - Data source: local mock data only
 - API routes: intentionally not used in this phase
 
@@ -51,9 +51,9 @@ This is a portfolio demo only. It should be described as "inspired by Eightcap's
 ```text
 .
 ├── app/                    Expo Router screens
-│   ├── (tabs)/             Markets, Watchlist, Insights
+│   ├── (tabs)/             Home, Portfolio, Watchlist, Wallet
 │   ├── instrument/         Dynamic instrument detail route
-│   └── disclaimer.tsx      Demo boundary and risk notice
+│   └── disclaimer.tsx      Secondary project boundary note
 ├── assets/                 Expo app assets
 ├── src/
 │   ├── components/         Reusable UI components
@@ -72,11 +72,11 @@ This is a portfolio demo only. It should be described as "inspired by Eightcap's
 
 ## Implemented Screens
 
-- Markets dashboard with category filters, summary tiles, instrument rows, and sparklines.
-- Instrument detail screen with chart range controls, stats, and mock insight copy.
-- Watchlist tab with sorting modes.
-- Insights tab with knowledge-hub style cards.
-- Demo notice modal clarifying that all data is mocked and the project is not affiliated with Eightcap.
+- Home tab with active account value, day movement, market curve, movers card, and index strip.
+- My Investments tab with portfolio filters, holding rows, P/L, net value, and deposit CTA.
+- Watchlist tab with search, chips, quote table, bid/ask capsules, and add CTA.
+- Wallet tab with total value, currency selector, account balances, and transfer/deposit actions.
+- Instrument detail route with chart range controls, bid/ask stats, spread, and market state.
 
 ## Verification
 
@@ -88,9 +88,10 @@ npx expo export --platform web
 Browser verification covered:
 
 - `http://localhost:8082/`
-- `http://localhost:8082/instrument/XAUUSD`
+- `http://localhost:8082/portfolio`
 - `http://localhost:8082/watchlist`
-- `http://localhost:8082/insights`
+- `http://localhost:8082/wallet`
+- `http://localhost:8082/instrument/NVDA`
 
 Static web export was also verified and generated `dist/`, which is ignored by Git and can be used as the Vercel output later.
 

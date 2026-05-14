@@ -95,6 +95,34 @@ Basic prototype navigation was added with Figma reaction hotspots:
 
 The generated wireframes were checked through Figma metadata inspection and screenshots of the standard phone and tablet-web preview frames. After prototype links were added, the Market Home frame was screenshot-checked again to confirm transparent hotspots did not alter the UI.
 
+### Tradle-Inspired App Revision
+
+The user provided four iPhone screenshots as implementation references and requested the app feel like an active product state rather than an explanatory demo. The app structure was revised to four primary tabs:
+
+- Home
+- My Investments
+- Watchlist
+- Wallet
+
+The Eightcap public homepage was rechecked at https://www.eightcap.com/ and redirects to `/en/traders/`. The implementation keeps the observed white/near-white surfaces, black typography, bright green accent, and red/green movement states while reducing visible demo explanation in the main screens.
+
+Commands and checks used for this revision:
+
+```bash
+npm run typecheck
+npx expo export --platform web
+CI=1 npx expo start --web --port 8082
+```
+
+Chrome headless screenshots were captured for:
+
+```text
+http://127.0.0.1:8082/
+http://127.0.0.1:8082/portfolio
+http://127.0.0.1:8082/watchlist
+http://127.0.0.1:8082/wallet
+```
+
 The web app was opened and checked in the Codex in-app browser at:
 
 ```text
@@ -132,6 +160,12 @@ Create a mobile-first Figma wireframe and visual direction for a React Native ma
 
 ```text
 Scaffold an Expo Router + TypeScript React Native app for the Eightcap Market Demo. Use mock data only. Implement the Market Home, Instrument Detail, Watchlist, Insights, and Disclaimer screens. Keep the layout mobile-first, responsive on web, and visually aligned with docs/eightcap-mobile-demo-brief.md.
+```
+
+Updated implementation direction:
+
+```text
+Revise the Expo Router app into a Tradle-inspired active account experience with four tabs: Home, My Investments, Watchlist, and Wallet. Preserve Eightcap's white/black/green visual theme, use mock account/stock data, and avoid repeated on-screen demo explanations in the primary product flow.
 ```
 
 ### Review Prompt

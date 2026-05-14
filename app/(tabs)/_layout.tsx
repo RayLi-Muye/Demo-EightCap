@@ -1,6 +1,5 @@
-import { Link, Tabs } from "expo-router";
-import { Activity, Bookmark, Info, Newspaper } from "lucide-react-native";
-import { Pressable } from "react-native";
+import { Tabs } from "expo-router";
+import { ChartPie, Eye, House, Wallet } from "lucide-react-native";
 
 import { colors } from "@/design/theme";
 
@@ -8,36 +7,19 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerShown: true,
-        headerShadowVisible: false,
-        headerStyle: { backgroundColor: colors.surface },
-        headerTitleStyle: {
-          color: colors.ink,
-          fontSize: 17,
-          fontWeight: "700",
-        },
-        headerRight: () => (
-          <Link href="/disclaimer" asChild>
-            <Pressable
-              accessibilityLabel="Open demo notice"
-              hitSlop={12}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.55 : 1,
-                paddingHorizontal: 16,
-                paddingVertical: 8,
-              })}
-            >
-              <Info color={colors.ink} size={21} strokeWidth={2.2} />
-            </Pressable>
-          </Link>
-        ),
-        tabBarActiveTintColor: colors.ink,
+        headerShown: false,
+        tabBarActiveTintColor: colors.brandAction,
         tabBarInactiveTintColor: colors.muted,
-        tabBarLabelStyle: { fontSize: 12, fontWeight: "600" },
+        tabBarItemStyle: {
+          flex: 1,
+          minWidth: 0,
+        },
+        tabBarLabelStyle: { fontSize: 12, fontWeight: "700" },
+        tabBarLabelPosition: "below-icon",
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.line,
-          height: 84,
+          height: 88,
           paddingBottom: 22,
           paddingTop: 8,
         },
@@ -46,27 +28,36 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Markets",
+          title: "主页",
           tabBarIcon: ({ color, focused }) => (
-            <Activity color={color} size={focused ? 24 : 22} strokeWidth={2.2} />
+            <House color={color} size={focused ? 25 : 23} strokeWidth={2.4} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="portfolio"
+        options={{
+          title: "我的投资",
+          tabBarIcon: ({ color, focused }) => (
+            <ChartPie color={color} size={focused ? 25 : 23} strokeWidth={2.4} />
           ),
         }}
       />
       <Tabs.Screen
         name="watchlist"
         options={{
-          title: "Watchlist",
+          title: "关注列表",
           tabBarIcon: ({ color, focused }) => (
-            <Bookmark color={color} size={focused ? 24 : 22} strokeWidth={2.2} />
+            <Eye color={color} size={focused ? 25 : 23} strokeWidth={2.4} />
           ),
         }}
       />
       <Tabs.Screen
-        name="insights"
+        name="wallet"
         options={{
-          title: "Insights",
+          title: "钱包",
           tabBarIcon: ({ color, focused }) => (
-            <Newspaper color={color} size={focused ? 24 : 22} strokeWidth={2.2} />
+            <Wallet color={color} size={focused ? 25 : 23} strokeWidth={2.4} />
           ),
         }}
       />

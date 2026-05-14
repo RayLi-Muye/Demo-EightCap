@@ -8,6 +8,12 @@ Build a polished React Native / Expo demo that lets reviewers browse mocked mark
 
 This is not a trading product and not an official Eightcap app. It should use mock data and clearly label any trading-like screens as demo content.
 
+Implementation update:
+
+- Keep the visible app experience closer to a real in-use account product. Avoid repeated on-screen explanations that the build is a demo.
+- Preserve Eightcap's homepage color logic: white/near-white canvas, strong black typography, bright green accent, light gray controls, and red/green market movement.
+- Use the provided Tradle iPhone references for structure and density: home, my investments, watchlist, and wallet balance.
+
 ## Reference Signals From Eightcap
 
 Source inspected: https://www.eightcap.com/en/traders/
@@ -50,33 +56,35 @@ Primary reviewer impression:
 
 ## Core Screens
 
-1. Market Home
-   - Sticky translucent header.
-   - Account/demo status strip.
-   - Hero summary: total watchlist movement, top mover, volatility state.
-   - Horizontal market categories: Forex, Indices, Commodities, Crypto.
-   - Top instruments list inspired by Eightcap's public table.
+1. Home
+   - Header with menu, promotion pill, and notification badge.
+   - Active account value, daily P/L, and large green area chart.
+   - Movers card with vertical bars.
+   - Compact market index strip.
 
-2. Instrument Detail
-   - Symbol, price, percentage move, spread, leverage, and market status.
-   - Mock sparkline or area chart.
-   - Quick range selector: 1D, 1W, 1M, 3M.
-   - Key stats grid.
-   - Mock insight card with risk note.
+2. My Investments
+   - Portfolio total in the header.
+   - Filter chips: pending orders, trades, open, stocks.
+   - Holding rows with price, movement, P/L, and net value.
+   - Available balance and deposit CTA.
 
 3. Watchlist
-   - Saved instruments.
-   - Sort by movement, spread, or category.
-   - Empty and loading states for polish.
+   - Header search.
+   - Watchlist title with controls.
+   - Horizontal filter chips.
+   - Bid/ask quote table.
+   - Floating add CTA.
 
-4. Insights
-   - Mock market updates.
-   - Education/tool cards echoing Eightcap's "tools" and "knowledge hub" content areas.
+4. Wallet Balance
+   - Total value card and currency selector.
+   - Funding prompt card.
+   - USD/AUD/GBP account rows.
+   - Deposit and transfer actions.
 
-5. Demo Disclaimer
-   - Clear non-trading disclaimer.
-   - Brief risk warning language.
-   - Link-style CTA back to markets.
+5. Instrument Detail
+   - Symbol, price, percentage move, bid/ask, spread, and market status.
+   - Range selector: 1D, 1W, 1M, 3M.
+   - Green/red area chart.
 
 ## Mock Data Model
 
@@ -166,7 +174,7 @@ Implementation principles:
 - Build reusable components first: instrument row, market card, stat tile, segmented filter, sparkline card, insight card.
 - Keep visual tokens centralized.
 - Avoid real trading forms, real account actions, or misleading order flows.
-- Include a visible demo/risk disclaimer.
+- Keep legal/demo boundary information out of the primary product flow unless needed for delivery notes.
 
 ## Interview Delivery Strategy
 

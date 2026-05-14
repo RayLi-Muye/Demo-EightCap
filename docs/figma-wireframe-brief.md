@@ -12,6 +12,7 @@ Use this document as the starting point for Figma wireframes and a clickable pro
 - URL: https://www.figma.com/design/CsK2FHAqyu4bmOkiXTmkGp
 - Pages: `00 Cover`, `01 Wireframes`, `02 Components`
 - Status: mobile-first wireframes created, basic prototype navigation wired, and visually checked against standard phone and tablet-web preview frames.
+- Follow-up: the code implementation has since shifted toward a Tradle-inspired four-tab account app: Home, My Investments, Watchlist, and Wallet. The Figma wireframe should be revised in the next design pass to match this IA.
 
 ## Frames
 

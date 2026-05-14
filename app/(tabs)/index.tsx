@@ -1,74 +1,44 @@
-import { useMemo, useState } from "react";
-import { RefreshControl, Text, View } from "react-native";
+import { PenLine } from "lucide-react-native";
+import { Pressable, View } from "react-native";
 
-import { InstrumentRow } from "@/components/instrument-row";
-import { MarketHero } from "@/components/market-hero";
+import { AppHeader } from "@/components/app-header";
+import { HomeValueChart } from "@/components/home-value-chart";
+import { MarketIndexStrip } from "@/components/market-index-strip";
+import { MoverCard } from "@/components/mover-card";
 import { ScreenScroll } from "@/components/screen-scroll";
-import { SectionHeader } from "@/components/section-header";
-import { SegmentedControl } from "@/components/segmented-control";
-import { StatTile } from "@/components/stat-tile";
-import { categories, instruments, marketSummary, type MarketCategory } from "@/data/instruments";
-import { colors, spacing } from "@/design/theme";
-import { formatPercent } from "@/utils/format";
+import { colors, radius, shadows, spacing } from "@/design/theme";
 
-type CategoryFilter = "all" | MarketCategory;
-
-const categorySegments: Array<{ label: string; value: CategoryFilter }> = [
-  { label: "All", value: "all" },
-  ...categories.map((category) => ({
-    label: category.label,
-    value: category.value,
-  })),
-];
-
-export default function MarketsScreen() {
-  const [category, setCategory] = useState<CategoryFilter>("all");
-  const [refreshing, setRefreshing] = useState(false);
-
-  const filteredInstruments = useMemo(() => {
-    if (category === "all") {
-      return instruments;
-    }
-
-    return instruments.filter((instrument) => instrument.category === category);
-  }, [category]);
-
-  function handleRefresh() {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 700);
-  }
-
+export default function HomeScreen() {
   return (
-    <ScreenScroll
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          tintColor={colors.brand}
-          onRefresh={handleRefresh}
-        />
-      }
-    >
-      <MarketHero />
+    <ScreenScroll includeTopInset bottomInset={110}>
+      <AppHeader rewardLabel="获得 $200" />
 
-      <View style={{ flexDirection: "row", gap: spacing.md }}>
-        <StatTile label="Watchlist move" value={formatPercent(marketSummary.watchlistMove)} tone="positive" />
-        <StatTile label="Volatility" value={marketSummary.volatility} tone="neutral" />
-      </View>
+      <HomeValueChart />
 
-      <SegmentedControl value={category} segments={categorySegments} onChange={setCategory} />
+      <MoverCard />
 
-      <View style={{ gap: spacing.sm }}>
-        <SectionHeader eyebrow="Mock market data" title="Top instruments" />
-        <Text selectable style={{ color: colors.muted, fontSize: 13, lineHeight: 18 }}>
-          Prices, spreads, leverage, and movement are deterministic demo data for UI review only.
-        </Text>
-      </View>
+      <MarketIndexStrip />
 
-      <View style={{ gap: spacing.sm }}>
-        {filteredInstruments.map((instrument) => (
-          <InstrumentRow key={instrument.symbol} instrument={instrument} />
-        ))}
-      </View>
+      <Pressable
+        accessibilityLabel="Edit quick actions"
+        accessibilityRole="button"
+        style={({ pressed }) => ({
+          ...shadows.card,
+          alignItems: "center",
+          alignSelf: "flex-end",
+          backgroundColor: colors.brandAction,
+          borderRadius: radius.full,
+          height: 64,
+          justifyContent: "center",
+          marginTop: -spacing.md,
+          opacity: pressed ? 0.75 : 1,
+          width: 64,
+        })}
+      >
+        <PenLine color={colors.inverse} size={27} strokeWidth={2.4} />
+      </Pressable>
+
+      <View style={{ height: spacing.md }} />
     </ScreenScroll>
   );
 }
