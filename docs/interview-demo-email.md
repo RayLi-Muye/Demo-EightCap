@@ -14,6 +14,8 @@ Thank you again for giving me the opportunity to complete this demonstration.
 
 I built the project as a React Native / Expo prototype for a mobile-first trading experience. It uses mock market and portfolio data, but the app flow is interactive: the user can move through the main tabs, inspect assets, open stock detail pages, use wallet actions, and place simulated buy/sell orders.
 
+For the visual direction, I referenced the main visual language of the Eightcap public website and used the green from the Eightcap logo as the primary theme color.
+
 Demo link:
 
 https://demo-eightcap.vercel.app
@@ -59,6 +61,8 @@ Hi [Name],
 Thank you again for the opportunity to complete this demonstration.
 
 I built the project as a React Native / Expo prototype for a mobile-first trading experience. The app uses mock market and portfolio data, but the product flow is interactive: it includes five tabs, wallet actions, stock detail pages, contextual menus, and simulated buy/sell order flows.
+
+The visual direction references Eightcap's public website, with the green from the Eightcap logo used as the primary theme color.
 
 Demo link:
 
