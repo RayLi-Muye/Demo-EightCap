@@ -1,0 +1,385 @@
+const childProcess = require("node:child_process");
+const fs = require("node:fs");
+const http = require("node:http");
+const os = require("node:os");
+const path = require("node:path");
+
+const root = path.resolve(__dirname, "..");
+const distDir = path.join(root, "dist");
+const port = Number(process.env.VERIFY_WEB_PORT ?? 4188);
+const remoteBaseUrl = process.env.VERIFY_WEB_BASE_URL?.replace(/\/$/, "");
+const baseUrl = remoteBaseUrl ?? `http://127.0.0.1:${port}`;
+const holdingsKey = "eightcap-demo-portfolio-holdings-v1";
+const accountsKey = "eightcap-demo-wallet-accounts-v1";
+
+const chromeCandidates = [
+  process.env.CHROME_PATH,
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "/Applications/Chromium.app/Contents/MacOS/Chromium",
+  "/usr/bin/google-chrome",
+  "/usr/bin/chromium",
+].filter(Boolean);
+
+function assert(condition, message) {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
+function findChrome() {
+  const chromePath = chromeCandidates.find((candidate) => fs.existsSync(candidate));
+
+  if (!chromePath) {
+    throw new Error("Chrome executable not found. Set CHROME_PATH to run web demo verification.");
+  }
+
+  return chromePath;
+}
+
+function contentType(filePath) {
+  const extension = path.extname(filePath);
+
+  switch (extension) {
+    case ".css":
+      return "text/css";
+    case ".html":
+      return "text/html";
+    case ".ico":
+      return "image/x-icon";
+    case ".js":
+      return "text/javascript";
+    case ".json":
+      return "application/json";
+    case ".png":
+      return "image/png";
+    case ".svg":
+      return "image/svg+xml";
+    default:
+      return "application/octet-stream";
+  }
+}
+
+function resolveStaticPath(urlPath) {
+  const decoded = decodeURIComponent(urlPath.split("?")[0]);
+  const cleanPath = decoded === "/" ? "/index.html" : decoded;
+  const directPath = path.join(distDir, cleanPath);
+  const htmlPath = path.join(distDir, `${cleanPath}.html`);
+  const nestedIndexPath = path.join(distDir, cleanPath, "index.html");
+
+  for (const candidate of [directPath, htmlPath, nestedIndexPath]) {
+    if (candidate.startsWith(distDir) && fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
+      return candidate;
+    }
+  }
+
+  return path.join(distDir, "index.html");
+}
+
+function createStaticServer() {
+  return http.createServer((request, response) => {
+    const filePath = resolveStaticPath(request.url ?? "/");
+    response.writeHead(200, { "Content-Type": contentType(filePath) });
+    fs.createReadStream(filePath).pipe(response);
+  });
+}
+
+function requestJson(url) {
+  return new Promise((resolve, reject) => {
+    http
+      .get(url, (response) => {
+        let body = "";
+        response.setEncoding("utf8");
+        response.on("data", (chunk) => {
+          body += chunk;
+        });
+        response.on("end", () => {
+          try {
+            resolve(JSON.parse(body));
+          } catch (error) {
+            reject(error);
+          }
+        });
+      })
+      .on("error", reject);
+  });
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function waitForDevtools(portNumber) {
+  const deadline = Date.now() + 10_000;
+
+  while (Date.now() < deadline) {
+    try {
+      const targets = await requestJson(`http://127.0.0.1:${portNumber}/json/list`);
+      const page = targets.find((target) => target.type === "page");
+
+      if (page) {
+        return page;
+      }
+    } catch {
+      await sleep(120);
+    }
+  }
+
+  throw new Error("Timed out waiting for Chrome DevTools target.");
+}
+
+async function connectCdp(webSocketUrl) {
+  const socket = new WebSocket(webSocketUrl);
+  const pending = new Map();
+  let id = 0;
+
+  socket.onmessage = (event) => {
+    const message = JSON.parse(event.data);
+
+    if (message.id && pending.has(message.id)) {
+      const { reject, resolve } = pending.get(message.id);
+      pending.delete(message.id);
+      message.error ? reject(new Error(JSON.stringify(message.error))) : resolve(message.result);
+    }
+  };
+
+  await new Promise((resolve, reject) => {
+    socket.onopen = resolve;
+    socket.onerror = reject;
+  });
+
+  function send(method, params = {}) {
+    return new Promise((resolve, reject) => {
+      id += 1;
+      pending.set(id, { reject, resolve });
+      socket.send(JSON.stringify({ id, method, params }));
+    });
+  }
+
+  return {
+    close: () => socket.close(),
+    send,
+  };
+}
+
+async function evaluate(client, expression) {
+  const result = await client.send("Runtime.evaluate", {
+    awaitPromise: true,
+    expression,
+    returnByValue: true,
+  });
+
+  if (result.exceptionDetails) {
+    throw new Error(JSON.stringify(result.exceptionDetails));
+  }
+
+  return result.result.value;
+}
+
+async function waitFor(client, expression, label, timeout = 8_000) {
+  const deadline = Date.now() + timeout;
+
+  while (Date.now() < deadline) {
+    if (await evaluate(client, expression)) {
+      return;
+    }
+
+    await sleep(150);
+  }
+
+  throw new Error(`Timed out waiting for ${label}`);
+}
+
+async function navigate(client, route) {
+  await client.send("Page.navigate", { url: `${baseUrl}${route}` });
+  await sleep(350);
+}
+
+async function clickLabel(client, label) {
+  await evaluate(client, `document.querySelector('[aria-label="${label}"]')?.click()`);
+}
+
+function accountBalance(accounts, code) {
+  return accounts.find((account) => account.code === code)?.available ?? null;
+}
+
+async function storedAccounts(client) {
+  return evaluate(client, `JSON.parse(localStorage.getItem('${accountsKey}') || '[]')`);
+}
+
+async function storedHoldings(client) {
+  return evaluate(client, `JSON.parse(localStorage.getItem('${holdingsKey}') || '[]')`);
+}
+
+async function runVerification(client) {
+  await client.send("Page.enable");
+  await client.send("Runtime.enable");
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    deviceScaleFactor: 2,
+    height: 844,
+    mobile: true,
+    width: 390,
+  });
+
+  await navigate(client, "/");
+  await waitFor(client, `document.body.innerText.includes('Enter App')`, "launch splash");
+  await clickLabel(client, "Enter main interface");
+  await waitFor(client, `document.body.innerText.includes('Cash and Holding')`, "home");
+
+  await evaluate(client, `localStorage.removeItem('${holdingsKey}'); localStorage.removeItem('${accountsKey}');`);
+
+  await navigate(client, "/discover");
+  await waitFor(client, `document.body.innerText.includes('Discover') && document.body.innerText.includes('Financial Business')`, "discover content");
+  assert(await evaluate(client, `document.body.innerText.includes('Top Movers')`), "Discover should show Top Movers.");
+
+  await navigate(client, "/wallet");
+  await waitFor(client, `document.body.innerText.includes('Wallet') && document.body.innerText.includes('USD Account')`, "wallet");
+  await clickLabel(client, "Open USD wallet actions");
+  await waitFor(client, `[...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Deposit USD')`, "wallet actions");
+  await clickLabel(client, "Deposit USD");
+  await waitFor(client, `document.body.innerText.includes('Deposited $500.00 to USD')`, "wallet deposit feedback");
+  const afterDeposit = await storedAccounts(client);
+  assert(accountBalance(afterDeposit, "USD") === 4160.39, "Deposit should increase USD cash to 4160.39.");
+
+  await clickLabel(client, "Open USD wallet actions");
+  await waitFor(client, `[...document.querySelectorAll('[aria-label]')].some((node) => node.getAttribute('aria-label') === 'Transfer USD')`, "wallet transfer action");
+  await clickLabel(client, "Transfer USD");
+  await waitFor(client, `document.body.innerText.includes('Transferred $250.00 from USD to AUD')`, "wallet transfer feedback");
+  const afterTransfer = await storedAccounts(client);
+  assert(accountBalance(afterTransfer, "USD") === 3910.39, "Transfer should reduce USD cash to 3910.39.");
+  assert(accountBalance(afterTransfer, "AUD") === 250, "Transfer should increase AUD cash to 250.");
+
+  await navigate(client, "/instrument/NVDA");
+  await waitFor(client, `document.body.innerText.includes('NVDA') && document.body.innerText.includes('Trade')`, "NVDA detail");
+  await clickLabel(client, "Open trade choices");
+  await waitFor(client, `document.body.innerText.includes('Available cash') && document.body.innerText.includes('Place Buy Order')`, "buy ticket");
+  await clickLabel(client, "Place buy order");
+  await waitFor(client, `document.body.innerText.includes('Buy filled')`, "buy confirmation");
+  const holdingsAfterBuy = await storedHoldings(client);
+  const accountsAfterBuy = await storedAccounts(client);
+  assert(holdingsAfterBuy.some((holding) => holding.symbol === "NVDA"), "NVDA should be added to portfolio after buy.");
+  assert(accountBalance(accountsAfterBuy, "USD") < 3910.39, "Buy should reduce USD cash.");
+
+  await navigate(client, "/portfolio");
+  await waitFor(client, `document.body.innerText.includes('Assets (6)') && document.body.innerText.includes('NVDA')`, "portfolio NVDA");
+
+  await navigate(client, "/instrument/AMD");
+  await waitFor(client, `document.body.innerText.includes('AMD') && document.body.innerText.includes('Trade')`, "AMD detail");
+  await clickLabel(client, "Open trade choices");
+  await waitFor(client, `document.body.innerText.includes('Place Buy Order')`, "AMD ticket");
+  await evaluate(client, `[...document.querySelectorAll('[role="button"]')].find((node) => node.textContent === 'Sell')?.click()`);
+  await sleep(250);
+  assert(await evaluate(client, `document.querySelector('[aria-label="Place sell order"]')?.disabled === true`), "Sell should be disabled for unheld AMD.");
+
+  await navigate(client, "/watchlist");
+  await waitFor(client, `document.body.innerText.includes('Watch List') && document.body.innerText.includes('Market')`, "watch list");
+
+  await navigate(client, "/wallet");
+  await waitFor(client, `document.body.innerText.includes('Wallet')`, "wallet final route");
+}
+
+async function runDesktopNavigationVerification(client) {
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    deviceScaleFactor: 1,
+    height: 800,
+    mobile: false,
+    width: 1280,
+  });
+
+  await navigate(client, "/discover");
+  await waitFor(client, `document.body.innerText.includes('Discover')`, "desktop discover route");
+
+  const navState = await evaluate(
+    client,
+    `(() => {
+      const labels = ['Home tab', 'Invest tab', 'Watchlist tab', 'Discover tab', 'Search tab'];
+      return labels.map((label) => {
+        const nodes = [...document.querySelectorAll('[aria-label="' + label + '"]')];
+        const candidates = nodes.map((candidate) => {
+          const rect = candidate.getBoundingClientRect();
+          const parent = candidate.parentElement?.getBoundingClientRect();
+          return {
+            bottom: rect.bottom,
+            height: rect.height,
+            left: rect.left,
+            parentWidth: parent?.width ?? null,
+            right: rect.right,
+            top: rect.top,
+            width: rect.width,
+          };
+        });
+        const node = nodes
+          .map((candidate) => ({ candidate, rect: candidate.getBoundingClientRect() }))
+          .find(({ rect }) => rect.width > 24 && rect.height > 24)?.candidate ?? nodes[0];
+        if (!node) return { label, exists: false };
+        const rect = node.getBoundingClientRect();
+        return {
+          bottom: rect.bottom,
+          candidates,
+          exists: true,
+          height: rect.height,
+          label,
+          left: rect.left,
+          right: rect.right,
+          top: rect.top,
+          width: rect.width,
+        };
+      });
+    })()`,
+  );
+
+  const viewport = await evaluate(client, `({ height: window.innerHeight, width: window.innerWidth })`);
+  const missing = navState.filter((item) => !item.exists).map((item) => item.label);
+  assert(missing.length === 0, `Desktop navigation missing labels: ${missing.join(", ")}`);
+  navState.forEach((item) => {
+    assert(item.width > 24 && item.height > 24, `${item.label} should have a visible desktop hit area: ${JSON.stringify(item)}`);
+    assert(item.top >= 0 && item.bottom <= viewport.height, `${item.label} should be inside the desktop viewport: ${JSON.stringify(item)}`);
+    assert(item.left >= 0 && item.right <= viewport.width, `${item.label} should be inside the desktop viewport width: ${JSON.stringify(item)}`);
+  });
+}
+
+async function main() {
+  assert(remoteBaseUrl || fs.existsSync(distDir), "dist directory not found. Run npm run export:web before verify:web-demo.");
+
+  const chromePath = findChrome();
+  const server = remoteBaseUrl ? null : createStaticServer();
+  if (server) {
+    await new Promise((resolve) => server.listen(port, "127.0.0.1", resolve));
+  }
+
+  const debugPort = port + 1000;
+  const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), "eightcap-web-verify-"));
+  const chrome = childProcess.spawn(chromePath, [
+    "--headless=new",
+    "--disable-background-networking",
+    "--disable-component-update",
+    "--disable-gpu",
+    "--no-default-browser-check",
+    "--no-first-run",
+    `--remote-debugging-port=${debugPort}`,
+    `--user-data-dir=${userDataDir}`,
+    `${baseUrl}/`,
+  ], {
+    stdio: "ignore",
+  });
+
+  let client;
+
+  try {
+    const page = await waitForDevtools(debugPort);
+    client = await connectCdp(page.webSocketDebuggerUrl);
+    await runVerification(client);
+    await runDesktopNavigationVerification(client);
+    console.log("Web demo verification passed.");
+  } finally {
+    client?.close();
+    chrome.kill();
+    server?.close();
+    fs.rmSync(userDataDir, { force: true, recursive: true });
+  }
+}
+
+main().catch((error) => {
+  console.error("Web demo verification failed:");
+  console.error(error.message);
+  process.exit(1);
+});

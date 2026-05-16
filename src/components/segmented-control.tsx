@@ -57,7 +57,7 @@ export function SegmentedControl<T extends string>({ value, segments, onChange }
               style={{
                 color: active ? colors.inverse : colors.muted,
                 fontSize: 13,
-                fontWeight: "800",
+                fontWeight: "500",
               }}
             >
               {segment.label}

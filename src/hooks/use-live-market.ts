@@ -13,6 +13,12 @@ type IndexQuote = {
   changePercent: number;
 };
 
+type LiveAssetsState<T extends EquityAsset> = {
+  assets: T[];
+  pulses: Record<string, PricePulse>;
+  sourceKey: string;
+};
+
 function nudge(symbol: string, tick: number, scale: number) {
   const seed = [...symbol].reduce((total, char) => total + char.charCodeAt(0), 0);
   return Math.sin((tick + seed) * 1.37) * scale;
@@ -22,27 +28,54 @@ function pickIndexes(length: number, count: number, tick: number) {
   return Array.from({ length: Math.min(count, length) }, (_, index) => (tick * 2 + index * 3) % length);
 }
 
+function getAssetsKey(assets: EquityAsset[]) {
+  return assets
+    .map((asset) =>
+      [
+        asset.symbol,
+        asset.price,
+        asset.bid,
+        asset.ask,
+        asset.change,
+        asset.changePercent,
+        asset.sparkline.join(","),
+      ].join(":"),
+    )
+    .join("|");
+}
+
 export function useLiveAssets<T extends EquityAsset>(
   sourceAssets: T[],
   options: { count?: number; intervalMs?: number; scale?: number } = {},
 ) {
   const { count = 2, intervalMs = 2200, scale = 0.0018 } = options;
-  const [assets, setAssets] = useState(sourceAssets);
-  const [pulses, setPulses] = useState<Record<string, PricePulse>>({});
+  const sourceKey = useMemo(() => getAssetsKey(sourceAssets), [sourceAssets]);
+  const sourceAssetsRef = useRef(sourceAssets);
+  const sourceKeyRef = useRef(sourceKey);
+  const [liveState, setLiveState] = useState<LiveAssetsState<T>>(() => ({
+    assets: sourceAssets,
+    pulses: {},
+    sourceKey,
+  }));
   const tickRef = useRef(0);
   const sequenceRef = useRef(0);
 
   useEffect(() => {
-    setAssets(sourceAssets);
-  }, [sourceAssets]);
+    sourceAssetsRef.current = sourceAssets;
+    sourceKeyRef.current = sourceKey;
+  }, [sourceAssets, sourceKey]);
 
   useEffect(() => {
     const timer = setInterval(() => {
       tickRef.current += 1;
-      const activeIndexes = new Set(pickIndexes(sourceAssets.length, count, tickRef.current));
+      const activeSourceAssets = sourceAssetsRef.current;
+      const activeSourceKey = sourceKeyRef.current;
+      const activeIndexes = new Set(pickIndexes(activeSourceAssets.length, count, tickRef.current));
 
-      setAssets((currentAssets) =>
-        currentAssets.map((asset, index) => {
+      setLiveState((currentState) => {
+        const currentAssets = currentState.sourceKey === activeSourceKey ? currentState.assets : activeSourceAssets;
+        const nextPulses = currentState.sourceKey === activeSourceKey ? { ...currentState.pulses } : {};
+        const nextAssets = currentAssets.map((asset, index) => {
           if (!activeIndexes.has(index)) {
             return asset;
           }
@@ -53,11 +86,7 @@ export function useLiveAssets<T extends EquityAsset>(
           const nextChangePercent = asset.changePercent + (delta / Math.max(asset.price, 0.01)) * 100;
           const direction = delta >= 0 ? "up" : "down";
           sequenceRef.current += 1;
-
-          setPulses((currentPulses) => ({
-            ...currentPulses,
-            [asset.symbol]: { direction, sequence: sequenceRef.current },
-          }));
+          nextPulses[asset.symbol] = { direction, sequence: sequenceRef.current };
 
           return {
             ...asset,
@@ -68,14 +97,24 @@ export function useLiveAssets<T extends EquityAsset>(
             price: nextPrice,
             sparkline: [...asset.sparkline.slice(1), asset.sparkline[asset.sparkline.length - 1] + delta],
           };
-        }),
-      );
+        });
+
+        return {
+          assets: nextAssets,
+          pulses: nextPulses,
+          sourceKey: activeSourceKey,
+        };
+      });
     }, intervalMs);
 
     return () => clearInterval(timer);
-  }, [count, intervalMs, scale, sourceAssets]);
+  }, [count, intervalMs, scale]);
 
-  return { assets, pulses };
+  if (liveState.sourceKey !== sourceKey) {
+    return { assets: sourceAssets, pulses: {} };
+  }
+
+  return { assets: liveState.assets, pulses: liveState.pulses };
 }
 
 export function useLiveHoldings(sourceHoldings: Holding[]) {

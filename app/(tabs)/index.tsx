@@ -10,16 +10,16 @@ import { spacing } from "@/design/theme";
 
 function HomeBackdrop() {
   return (
-    <View style={{ height: 286, left: -32, pointerEvents: "none", position: "absolute", right: -32, top: -28 }}>
+    <View style={{ height: 430, left: -32, pointerEvents: "none", position: "absolute", right: -32, top: -28 }}>
       <Svg height="100%" width="100%">
         <Defs>
-          <LinearGradient id="homeWash" x1="0" x2="1" y1="0" y2="0.8">
-            <Stop offset="0" stopColor="#d8f5ea" stopOpacity="0.58" />
-            <Stop offset="0.5" stopColor="#ffffff" stopOpacity="0.18" />
-            <Stop offset="1" stopColor="#e1ecff" stopOpacity="0.46" />
+          <LinearGradient id="homeWash" x1="0" x2="0" y1="0" y2="1">
+            <Stop offset="0" stopColor="#d8f5ea" stopOpacity="0.62" />
+            <Stop offset="0.52" stopColor="#e8f7ef" stopOpacity="0.38" />
+            <Stop offset="1" stopColor="#f8f9f5" stopOpacity="0" />
           </LinearGradient>
         </Defs>
-        <Rect fill="url(#homeWash)" height="100%" rx="34" width="100%" />
+        <Rect fill="url(#homeWash)" height="100%" width="100%" />
       </Svg>
     </View>
   );

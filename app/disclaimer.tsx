@@ -58,7 +58,7 @@ export default function DisclaimerScreen() {
             padding: spacing.md,
           })}
         >
-          <Text style={{ color: colors.ink, fontSize: 15, fontWeight: "800" }}>Back to markets</Text>
+          <Text style={{ color: colors.ink, fontSize: 15, fontWeight: "500" }}>Back to markets</Text>
         </Pressable>
       </Link>
     </ScreenScroll>

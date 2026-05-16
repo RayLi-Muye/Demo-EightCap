@@ -1,5 +1,5 @@
 import * as Haptics from "expo-haptics";
-import { Eye, EyeOff, Maximize2, Minimize2 } from "lucide-react-native";
+import { ArrowDownToLine, ArrowUpFromLine, Eye, EyeOff, Maximize2, Minimize2 } from "lucide-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, Text, View, useWindowDimensions } from "react-native";
 import Animated, {
@@ -12,16 +12,15 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { accountSummary, homeCurve } from "@/data/portfolio";
+import { PageTitle } from "@/components/page-title";
+import { homeRangeDeltas, type HomeChartRange } from "@/data/portfolio";
 import { colors, radius, spacing } from "@/design/theme";
+import { useDemoAccountSummary } from "@/hooks/use-demo-portfolio";
 import { formatCurrency, formatPercent, formatSignedCurrency } from "@/utils/format";
 
-import { GlassSurface } from "./glass-surface";
-import { Sparkline } from "./sparkline";
+import { Sparkline, type SparklineDatum } from "./sparkline";
 
-type RangeScale = "hourly" | "daily" | "weekly" | "monthly" | "quarterly" | "yearly";
-
-const RANGE_OPTIONS: { label: string; value: RangeScale }[] = [
+const RANGE_OPTIONS: { label: string; value: HomeChartRange }[] = [
   { label: "1H", value: "hourly" },
   { label: "1D", value: "daily" },
   { label: "1W", value: "weekly" },
@@ -30,25 +29,33 @@ const RANGE_OPTIONS: { label: string; value: RangeScale }[] = [
   { label: "1Y", value: "yearly" },
 ];
 
-const RANGE_META: Record<RangeScale, { multiplier: number; slope: number }> = {
-  hourly: { multiplier: 0.28, slope: 0.03 },
-  daily: { multiplier: 1, slope: 0.08 },
-  weekly: { multiplier: 1.35, slope: 0.14 },
-  monthly: { multiplier: 1.75, slope: 0.2 },
-  quarterly: { multiplier: 2.2, slope: 0.28 },
-  yearly: { multiplier: 2.85, slope: 0.34 },
+const homeChartEnd = new Date(2026, 4, 15, 15, 30);
+const homeDateFormatter = new Intl.DateTimeFormat("en-US", { day: "numeric", month: "short", year: "numeric" });
+const homeTimeFormatter = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit" });
+const homeRangeStepMinutes: Record<HomeChartRange, number> = {
+  hourly: 2,
+  daily: 12,
+  weekly: 360,
+  monthly: 1440,
+  quarterly: 4320,
+  yearly: 17520,
 };
 
-function AccountMetric({ label, value }: { label: string; value: number }) {
+function getHomeChartDate(index: number, total: number, range: HomeChartRange) {
+  const offset = (total - 1 - index) * homeRangeStepMinutes[range] * 60 * 1000;
+  return new Date(homeChartEnd.getTime() - offset);
+}
+
+function AccountMetric({ compact, label, value }: { compact: boolean; label: string; value: number }) {
   return (
-    <View style={{ flex: 1, gap: spacing.xs, minWidth: 0 }}>
-      <Text numberOfLines={1} style={{ color: colors.muted, fontSize: 12, fontWeight: "800" }}>
+    <View style={{ gap: spacing.xs, minWidth: 0 }}>
+      <Text numberOfLines={1} style={{ color: colors.muted, fontSize: compact ? 11 : 12, fontWeight: "500" }}>
         {label}
       </Text>
       <Text
         adjustsFontSizeToFit
         numberOfLines={1}
-        style={{ color: colors.ink, fontSize: 17, fontVariant: ["tabular-nums"], fontWeight: "900" }}
+        style={{ color: colors.ink, fontSize: compact ? 15 : 17, fontVariant: ["tabular-nums"], fontWeight: "600" }}
       >
         {formatCurrency(value)}
       </Text>
@@ -56,12 +63,46 @@ function AccountMetric({ label, value }: { label: string; value: number }) {
   );
 }
 
+function FundsActionButton({ compact, label, variant }: { compact: boolean; label: string; variant: "primary" | "secondary" }) {
+  const primary = variant === "primary";
+  const Icon = variant === "primary" ? ArrowDownToLine : ArrowUpFromLine;
+
+  return (
+    <Pressable
+      accessibilityLabel={label}
+      accessibilityRole="button"
+      onPress={() => {
+        Haptics.selectionAsync().catch(() => {});
+      }}
+      style={({ pressed }) => ({
+        alignItems: "center",
+        backgroundColor: primary ? colors.brandAction : "rgba(255,255,255,0.64)",
+        borderColor: primary ? "transparent" : "rgba(8,11,18,0.12)",
+        borderRadius: radius.full,
+        borderWidth: 1,
+        height: compact ? 38 : 38,
+        justifyContent: "center",
+        minWidth: compact ? 38 : 88,
+        opacity: pressed ? 0.72 : 1,
+        paddingHorizontal: compact ? 0 : spacing.md,
+        width: compact ? 38 : undefined,
+      })}
+    >
+      {compact ? (
+        <Icon color={primary ? colors.inverse : colors.ink} size={18} strokeWidth={2.5} />
+      ) : (
+        <Text style={{ color: primary ? colors.inverse : colors.ink, fontSize: 13, fontWeight: "600" }}>{label}</Text>
+      )}
+    </Pressable>
+  );
+}
+
 function TimeSlotControl({
   onChange,
   value,
 }: {
-  onChange: (value: RangeScale) => void;
-  value: RangeScale;
+  onChange: (value: HomeChartRange) => void;
+  value: HomeChartRange;
 }) {
   const [trackWidth, setTrackWidth] = useState(1);
   const activeIndex = Math.max(
@@ -132,7 +173,7 @@ function TimeSlotControl({
               zIndex: 1,
             }}
           >
-            <Text style={{ color: isActive ? colors.ink : colors.muted, fontSize: 13, fontWeight: "900" }}>{option.label}</Text>
+            <Text style={{ color: isActive ? colors.ink : colors.muted, fontSize: 13, fontWeight: "600" }}>{option.label}</Text>
           </Pressable>
         );
       })}
@@ -143,41 +184,45 @@ function TimeSlotControl({
 export function HomeValueChart() {
   const { width } = useWindowDimensions();
   const isPad = width >= 768;
-  const [range, setRange] = useState<RangeScale>("daily");
-  const [curve, setCurve] = useState(homeCurve);
+  const accountSummary = useDemoAccountSummary();
+  const [range, setRange] = useState<HomeChartRange>("daily");
+  const [liveOffset, setLiveOffset] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const [hidden, setHidden] = useState(false);
   const tickRef = useRef(0);
   const chartHeightValue = useSharedValue(isPad ? 181 : 150);
   const expandedProgress = useSharedValue(0);
-  const activeRange = RANGE_META[range];
 
   useEffect(() => {
     const timer = setInterval(() => {
       tickRef.current += 1;
-      setCurve((currentCurve) => {
-        const last = currentCurve[currentCurve.length - 1] ?? 62;
-        const delta = Math.sin(tickRef.current * 1.43) * 0.9 + 0.22;
-        return [...currentCurve.slice(1), Math.max(last + delta, 34)];
-      });
+      setLiveOffset(Math.sin(tickRef.current * 1.43) * 18 + Math.cos(tickRef.current * 0.78) * 6);
     }, 3400);
 
     return () => clearInterval(timer);
   }, []);
 
-  const liveValue = useMemo(() => {
-    const startingPoint = homeCurve[homeCurve.length - 1] ?? 62;
-    const currentPoint = curve[curve.length - 1] ?? startingPoint;
-    return accountSummary.totalValue + (currentPoint - startingPoint) * 18;
-  }, [curve]);
+  const liveValue = accountSummary.totalValue + liveOffset;
 
   const rangeCurve = useMemo(() => {
-    const base = homeCurve[0] ?? 38;
-    return curve.map((point, index) => base + (point - base) * activeRange.multiplier + index * activeRange.slope);
-  }, [activeRange.multiplier, activeRange.slope, curve]);
+    return homeRangeDeltas[range].map((delta) => liveValue + delta);
+  }, [liveValue, range]);
 
-  const scaledChange = accountSummary.totalChange * activeRange.multiplier;
-  const scaledPercent = accountSummary.totalChangePercent * activeRange.multiplier;
+  const chartData = useMemo<SparklineDatum[]>(() => {
+    return rangeCurve.map((value, index) => {
+      const date = getHomeChartDate(index, rangeCurve.length, range);
+      return {
+        dateLabel: homeDateFormatter.format(date),
+        timeLabel: homeTimeFormatter.format(date),
+        valueLabel: hidden ? "$********" : formatCurrency(value),
+      };
+    });
+  }, [hidden, range, rangeCurve]);
+
+  const firstRangeValue = rangeCurve[0] ?? liveValue;
+  const lastRangeValue = rangeCurve[rangeCurve.length - 1] ?? liveValue;
+  const scaledChange = lastRangeValue - firstRangeValue;
+  const scaledPercent = firstRangeValue === 0 ? 0 : (scaledChange / firstRangeValue) * 100;
   const movementColor = scaledChange >= 0 ? colors.positive : colors.negative;
   const collapsedChartHeight = isPad ? 181 : 150;
   const expandedChartHeight = isPad ? 210 : 174;
@@ -222,9 +267,9 @@ export function HomeValueChart() {
       <View style={{ gap: spacing.sm, paddingHorizontal: spacing.lg }}>
         <View style={{ alignItems: "center", flexDirection: "row", gap: spacing.md, justifyContent: "space-between" }}>
           <View style={{ flex: 1, minWidth: 0 }}>
-            <Text selectable numberOfLines={1} style={{ color: colors.brandAction, fontSize: isPad ? 28 : 25, fontWeight: "900" }}>
+            <PageTitle style={{ fontSize: isPad ? 28 : 25, lineHeight: isPad ? 34 : 31 }}>
               Cash and Holding
-            </Text>
+            </PageTitle>
           </View>
 
           <Pressable
@@ -263,7 +308,7 @@ export function HomeValueChart() {
                 flexShrink: 1,
                 fontSize: isPad ? 48 : 31,
                 fontVariant: ["tabular-nums"],
-                fontWeight: "900",
+                fontWeight: "500",
                 letterSpacing: 0,
               }}
             >
@@ -289,7 +334,7 @@ export function HomeValueChart() {
           <Text
             selectable
             numberOfLines={1}
-            style={{ color: movementColor, fontSize: isPad ? 16 : 12, fontVariant: ["tabular-nums"], fontWeight: "900" }}
+            style={{ color: movementColor, fontSize: isPad ? 16 : 12, fontVariant: ["tabular-nums"], fontWeight: "600" }}
           >
             {formatSignedCurrency(scaledChange)} ({formatPercent(scaledPercent)})
           </Text>
@@ -307,9 +352,11 @@ export function HomeValueChart() {
         ]}
       >
         <Sparkline
-          color={colors.brandAction}
+          color={movementColor}
+          data={chartData}
           fillArea
           height={chartHeight}
+          interactive
           showDot={false}
           showGuide={false}
           values={rangeCurve}
@@ -330,23 +377,26 @@ export function HomeValueChart() {
         <Animated.View layout={LinearTransition.duration(240)} style={[{ gap: spacing.md }, expandedPanelInnerStyle]}>
           <TimeSlotControl onChange={setRange} value={range} />
 
-          <GlassSurface
-            intensity={82}
-            tintColor="rgba(255,255,255,0.34)"
+          <View
             style={{
-              backgroundColor: "rgba(255,255,255,0.34)",
-              borderColor: "rgba(255,255,255,0.62)",
-              borderRadius: radius.lg,
-              borderWidth: 1,
+              alignItems: "center",
               flexDirection: "row",
-              gap: spacing.lg,
-              paddingHorizontal: spacing.lg,
-              paddingVertical: spacing.md,
+              gap: spacing.md,
+              justifyContent: "space-between",
+              paddingHorizontal: spacing.sm,
+              paddingVertical: spacing.xs,
             }}
           >
-            <AccountMetric label="Invested" value={accountSummary.investmentValue} />
-            <AccountMetric label="Available" value={accountSummary.availableCash} />
-          </GlassSurface>
+            <View style={{ flex: 1, flexDirection: "row", gap: spacing.lg, minWidth: 0 }}>
+              <AccountMetric compact={!isPad} label="Invested" value={accountSummary.investmentValue} />
+              <AccountMetric compact={!isPad} label="Available" value={accountSummary.availableCash} />
+            </View>
+            <View style={{ alignSelf: "stretch", backgroundColor: "rgba(8,11,18,0.12)", width: 1 }} />
+            <View style={{ flexDirection: "row", flexShrink: 0, gap: spacing.sm }}>
+              <FundsActionButton compact={!isPad} label="Deposit" variant="primary" />
+              <FundsActionButton compact={!isPad} label="Withdraw" variant="secondary" />
+            </View>
+          </View>
         </Animated.View>
       </Animated.View>
     </Animated.View>

@@ -107,10 +107,10 @@ function MoverRow({ asset, compact, index, pulse }: MoverRowProps) {
 
               <View style={{ flex: 1, minWidth: 0 }}>
                 <View style={{ gap: 2 }}>
-                  <Text numberOfLines={1} style={{ color: colors.ink, fontSize: compact ? 17 : 18, fontWeight: "900" }}>
+                  <Text numberOfLines={1} style={{ color: colors.ink, fontSize: compact ? 17 : 18, fontWeight: "600" }}>
                     {asset.symbol}
                   </Text>
-                  <Text numberOfLines={1} style={{ color: colors.muted, fontSize: compact ? 12 : 13, fontWeight: "700" }}>
+                  <Text numberOfLines={1} style={{ color: colors.muted, fontSize: compact ? 12 : 13, fontWeight: "500" }}>
                     {asset.name}
                   </Text>
                 </View>
@@ -126,10 +126,10 @@ function MoverRow({ asset, compact, index, pulse }: MoverRowProps) {
               />
 
               <View style={{ alignItems: "flex-end", gap: 3, minWidth: compact ? 68 : 82 }}>
-                <Text numberOfLines={1} style={{ color: colors.ink, fontSize: compact ? 14 : 15, fontVariant: ["tabular-nums"], fontWeight: "900" }}>
+                <Text numberOfLines={1} style={{ color: colors.ink, fontSize: compact ? 14 : 15, fontVariant: ["tabular-nums"], fontWeight: "600" }}>
                   {formatPrice(asset.price)}
                 </Text>
-                <Text numberOfLines={1} style={{ color: movementColor, fontSize: 12, fontVariant: ["tabular-nums"], fontWeight: "900" }}>
+                <Text numberOfLines={1} style={{ color: movementColor, fontSize: 12, fontVariant: ["tabular-nums"], fontWeight: "600" }}>
                   {formatPercent(asset.changePercent)}
                 </Text>
               </View>
@@ -177,7 +177,7 @@ export function MoverCard() {
     >
       <View style={{ alignItems: "center", flexDirection: "row", justifyContent: "space-between", gap: spacing.md }}>
         <View style={{ flex: 1, minWidth: 0 }}>
-          <Text selectable numberOfLines={1} style={{ color: colors.ink, fontSize: isPad ? 24 : 22, fontWeight: "900" }}>
+          <Text selectable numberOfLines={1} style={{ color: colors.ink, fontSize: isPad ? 24 : 22, fontWeight: "600" }}>
             Top Movers
           </Text>
         </View>

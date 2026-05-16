@@ -6,8 +6,8 @@ import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSequence, wi
 
 import type { Holding } from "@/data/portfolio";
 import type { PricePulse } from "@/hooks/use-live-market";
-import { colors, radius, spacing } from "@/design/theme";
-import { formatCurrency, formatPercent, formatPrice, formatSignedCurrency } from "@/utils/format";
+import { colors, spacing } from "@/design/theme";
+import { formatCurrency, formatPercent, formatPrice } from "@/utils/format";
 
 import { AssetLogo } from "./asset-logo";
 
@@ -58,7 +58,7 @@ export function HoldingRow({ holding, pulse }: HoldingRowProps) {
           backgroundColor: colors.surface,
           borderBottomColor: colors.line,
           borderBottomWidth: 1,
-          height: 96,
+          minHeight: 76,
           position: "relative",
         }}
       >
@@ -84,47 +84,56 @@ export function HoldingRow({ holding, pulse }: HoldingRowProps) {
                   alignItems: "center",
                   flexDirection: "row",
                   gap: spacing.sm,
-                  left: spacing.lg,
                   minWidth: 0,
-                  position: "absolute",
-                  top: 18,
-                  width: 150,
+                  paddingHorizontal: spacing.lg,
+                  paddingVertical: spacing.md,
                 }}
               >
-                <AssetLogo background={holding.logoBackground} color={holding.logoColor} label={holding.logoLabel} size={42} />
-                <View style={{ minWidth: 0, width: 98 }}>
-                  <View style={{ alignItems: "center", flexDirection: "row", gap: spacing.xs }}>
-                    <Text selectable numberOfLines={1} style={{ color: colors.ink, flexShrink: 1, fontSize: 17, fontWeight: "900" }}>
+                <View style={{ alignItems: "center", flex: 1, flexDirection: "row", gap: spacing.sm, minWidth: 0 }}>
+                  <AssetLogo background={holding.logoBackground} color={holding.logoColor} label={holding.logoLabel} size={32} />
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text selectable numberOfLines={1} style={{ color: colors.ink, fontSize: 18, fontWeight: "600" }}>
                       {holding.symbol}
                     </Text>
-                    <View style={{ backgroundColor: colors.surfaceAlt, borderRadius: radius.full, paddingHorizontal: 6, paddingVertical: 2 }}>
-                      <Text selectable style={{ color: colors.muted, fontSize: 12, fontWeight: "800" }}>
-                        {holding.dateLabel}
-                      </Text>
-                    </View>
+                    <Text selectable numberOfLines={1} style={{ color: colors.muted, fontSize: 12, fontVariant: ["tabular-nums"], fontWeight: "500" }}>
+                      {formatPrice(holding.price)}
+                    </Text>
                   </View>
-                  <Text selectable style={{ color: colors.ink, fontSize: 15, fontVariant: ["tabular-nums"], fontWeight: "600" }}>
-                    {formatPrice(holding.price)}
+                </View>
+
+                <View
+                  style={{
+                    alignItems: "center",
+                    flexDirection: "row",
+                    flexShrink: 0,
+                    justifyContent: "flex-end",
+                    width: 232,
+                  }}
+                >
+                  <Text
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    style={{ color: movementColor, fontSize: 12, fontVariant: ["tabular-nums"], fontWeight: "600", textAlign: "right", width: 52 }}
+                  >
+                    {formatPercent(holding.changePercent)}
+                  </Text>
+                  <Text style={{ color: colors.line, fontSize: 14, fontWeight: "500", textAlign: "center", width: 6 }}>|</Text>
+                  <Text
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    style={{ color: pnlColor, fontSize: 12, fontVariant: ["tabular-nums"], fontWeight: "600", textAlign: "right", width: 82 }}
+                  >
+                    {formatCurrency(holding.pnl)}
+                  </Text>
+                  <Text style={{ color: colors.line, fontSize: 14, fontWeight: "500", textAlign: "center", width: 6 }}>|</Text>
+                  <Text
+                    numberOfLines={1}
+                    adjustsFontSizeToFit
+                    style={{ color: colors.ink, fontSize: 12, fontVariant: ["tabular-nums"], fontWeight: "600", textAlign: "right", width: 86 }}
+                  >
+                    {formatCurrency(holding.value)}
                   </Text>
                 </View>
-              </View>
-
-              <View style={{ alignItems: "flex-end", justifyContent: "center", left: 166, position: "absolute", top: 36, width: 56 }}>
-                <Text selectable numberOfLines={1} adjustsFontSizeToFit style={{ color: movementColor, fontSize: 15, fontVariant: ["tabular-nums"], fontWeight: "700" }}>
-                  {formatPercent(holding.changePercent)}
-                </Text>
-              </View>
-
-              <View style={{ alignItems: "flex-end", justifyContent: "center", left: 222, position: "absolute", top: 36, width: 76 }}>
-                <Text selectable numberOfLines={1} adjustsFontSizeToFit style={{ color: pnlColor, fontSize: 13, fontVariant: ["tabular-nums"], fontWeight: "700" }}>
-                  {formatSignedCurrency(holding.pnl)}
-                </Text>
-              </View>
-
-              <View style={{ alignItems: "flex-end", justifyContent: "center", left: 298, position: "absolute", top: 36, width: 76 }}>
-                <Text selectable numberOfLines={1} adjustsFontSizeToFit style={{ color: colors.ink, fontSize: 13, fontVariant: ["tabular-nums"], fontWeight: "700" }}>
-                  {formatCurrency(holding.value)}
-                </Text>
               </View>
             </Animated.View>
           </View>

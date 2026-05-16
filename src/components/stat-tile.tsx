@@ -41,7 +41,7 @@ export function StatTile({ label, value, tone, inverse }: StatTileProps) {
         padding: spacing.md,
       }}
     >
-      <Text selectable style={{ color: inverse ? colors.inverseMuted : colors.muted, fontSize: 12, fontWeight: "700" }}>
+      <Text selectable style={{ color: inverse ? colors.inverseMuted : colors.muted, fontSize: 12, fontWeight: "500" }}>
         {label}
       </Text>
       <Text
@@ -50,7 +50,7 @@ export function StatTile({ label, value, tone, inverse }: StatTileProps) {
           color: toneColor(tone, inverse),
           fontSize: 21,
           fontVariant: ["tabular-nums"],
-          fontWeight: "900",
+          fontWeight: "600",
           letterSpacing: 0,
         }}
       >

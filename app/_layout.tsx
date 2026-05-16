@@ -1,4 +1,5 @@
 import { DefaultTheme, ThemeProvider } from "@react-navigation/native";
+import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { Stack } from "expo-router/stack";
 import { StatusBar } from "expo-status-bar";
@@ -31,9 +32,18 @@ const navigationTheme = {
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    "SpaceMono-Bold": require("../assets/fonts/SpaceMono-Bold.ttf"),
+    "SpaceMono-BoldItalic": require("../assets/fonts/SpaceMono-BoldItalic.ttf"),
+    "SpaceMono-Italic": require("../assets/fonts/SpaceMono-Italic.ttf"),
+    "SpaceMono-Regular": require("../assets/fonts/SpaceMono-Regular.ttf"),
+  });
+
   useEffect(() => {
-    SplashScreen.hideAsync().catch(() => {});
-  }, []);
+    if (fontsLoaded || fontError) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [fontError, fontsLoaded]);
 
   return (
     <ThemeProvider value={navigationTheme}>
@@ -45,7 +55,7 @@ export default function RootLayout() {
           headerTitleStyle: {
             color: colors.ink,
             fontSize: 17,
-            fontWeight: "700",
+            fontWeight: "500",
           },
         }}
       >

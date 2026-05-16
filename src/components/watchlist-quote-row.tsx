@@ -50,17 +50,6 @@ export function WatchlistQuoteRow({ asset, hotSide, pulse }: WatchlistQuoteRowPr
     transform: [{ scale: scale.value }],
   }));
 
-  function cellColor(side: "bid" | "ask") {
-    if (hotSide !== side) {
-      return colors.surfaceAlt;
-    }
-    return positive ? colors.positive : colors.negative;
-  }
-
-  function textColor(side: "bid" | "ask") {
-    return hotSide === side ? colors.ink : colors.subtle;
-  }
-
   return (
     <Link asChild href={{ pathname: "/instrument/[symbol]", params: { symbol: asset.symbol } }}>
       <Pressable
@@ -77,7 +66,7 @@ export function WatchlistQuoteRow({ asset, hotSide, pulse }: WatchlistQuoteRowPr
           backgroundColor: colors.surface,
           borderBottomColor: colors.line,
           borderBottomWidth: 1,
-          height: 78,
+          minHeight: 78,
           position: "relative",
         }}
       >
@@ -103,54 +92,74 @@ export function WatchlistQuoteRow({ asset, hotSide, pulse }: WatchlistQuoteRowPr
                   alignItems: "center",
                   flexDirection: "row",
                   gap: spacing.sm,
-                  left: spacing.lg,
                   minWidth: 0,
-                  position: "absolute",
-                  top: 14,
-                  width: 130,
+                  paddingHorizontal: spacing.lg,
+                  paddingVertical: spacing.md,
                 }}
               >
-                <AssetLogo background={asset.logoBackground} color={asset.logoColor} label={asset.logoLabel} size={42} />
-                <View style={{ minWidth: 0, width: 78 }}>
-                  <Text selectable numberOfLines={1} style={{ color: colors.ink, fontSize: 21, fontWeight: "900" }}>
-                    {asset.symbol}
-                  </Text>
-                  <Text selectable style={{ color: movementColor, fontSize: 16, fontVariant: ["tabular-nums"], fontWeight: "600" }}>
-                    {formatPercent(asset.changePercent)}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={{ flexDirection: "row", gap: spacing.sm, left: 154, position: "absolute", top: 14, width: 220 }}>
-                {(["bid", "ask"] as const).map((side) => (
-                  <View
-                    key={side}
-                    style={{
-                      alignItems: "center",
-                      backgroundColor: cellColor(side),
-                      borderRadius: radius.full,
-                      flex: 1,
-                      justifyContent: "center",
-                      minHeight: 48,
-                      minWidth: 0,
-                      paddingHorizontal: spacing.sm,
-                    }}
-                  >
-                    <Text
-                      selectable
-                      numberOfLines={1}
-                      adjustsFontSizeToFit
-                      style={{
-                        color: textColor(side),
-                        fontSize: 18,
-                        fontVariant: ["tabular-nums"],
-                        fontWeight: "900",
-                      }}
-                    >
-                      {formatPrice(side === "bid" ? asset.bid : asset.ask)}
+                <View style={{ alignItems: "center", flex: 1, flexDirection: "row", gap: spacing.sm, minWidth: 0 }}>
+                  <AssetLogo background={asset.logoBackground} color={asset.logoColor} label={asset.logoLabel} size={40} />
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text selectable numberOfLines={1} style={{ color: colors.ink, fontSize: 18, fontWeight: "600" }}>
+                      {asset.symbol}
+                    </Text>
+                    <Text selectable numberOfLines={1} style={{ color: colors.muted, fontSize: 12, fontWeight: "500" }}>
+                      {asset.name}
+                    </Text>
+                    <Text selectable numberOfLines={1} style={{ color: movementColor, fontSize: 13, fontVariant: ["tabular-nums"], fontWeight: "500" }}>
+                      {formatPercent(asset.changePercent)}
                     </Text>
                   </View>
-                ))}
+                </View>
+
+                <View style={{ flex: 1.12, flexDirection: "row", gap: spacing.sm, minWidth: 0 }}>
+                  {(["bid", "ask"] as const).map((side) => (
+                    <View
+                      key={side}
+                      style={{
+                        alignItems: "center",
+                        backgroundColor: colors.surfaceAlt,
+                        borderRadius: radius.sm,
+                        flex: 1,
+                        justifyContent: "center",
+                        minHeight: 48,
+                        minWidth: 0,
+                        overflow: "hidden",
+                        paddingHorizontal: spacing.xs,
+                      }}
+                    >
+                      {hotSide === side ? (
+                        <Animated.View
+                          style={[
+                            {
+                              backgroundColor: positive ? "rgba(13,187,79,0.9)" : "rgba(255,47,61,0.9)",
+                              bottom: 0,
+                              left: 0,
+                              pointerEvents: "none",
+                              position: "absolute",
+                              right: 0,
+                              top: 0,
+                            },
+                            flashStyle,
+                          ]}
+                        />
+                      ) : null}
+                      <Text
+                        selectable
+                        numberOfLines={1}
+                        adjustsFontSizeToFit
+                        style={{
+                          color: colors.ink,
+                          fontSize: 15,
+                          fontVariant: ["tabular-nums"],
+                          fontWeight: "600",
+                        }}
+                      >
+                        {formatPrice(side === "bid" ? asset.bid : asset.ask)}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
               </View>
             </Animated.View>
           </View>

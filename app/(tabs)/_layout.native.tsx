@@ -1,49 +1,58 @@
-import { NativeTabs } from "expo-router/unstable-native-tabs";
+import { Tabs } from "expo-router";
+import { ChartPie, Compass, Eye, House, Search } from "lucide-react-native";
 
 import { HeaderPanelProvider } from "@/components/header-panel-provider";
+import { SearchTabBar } from "@/components/search-tab-bar";
 import { colors } from "@/design/theme";
 
 export default function NativeTabLayout() {
   return (
     <HeaderPanelProvider>
-      <NativeTabs
-        backgroundColor="rgba(255,255,255,0.42)"
-        badgeBackgroundColor="#cf241b"
-        blurEffect="systemUltraThinMaterial"
-        disableTransparentOnScrollEdge
-        iconColor={{ default: colors.muted, selected: colors.brandAction }}
-        indicatorColor="rgba(5,184,63,0.14)"
-        labelStyle={{
-          default: { color: colors.muted, fontSize: 12, fontWeight: "700" },
-          selected: { color: colors.brandAction, fontSize: 12, fontWeight: "700" },
+      <Tabs
+        tabBar={(props) => <SearchTabBar {...props} />}
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveTintColor: colors.brandAction,
+          tabBarInactiveTintColor: colors.muted,
         }}
-        labelVisibilityMode="labeled"
-        minimizeBehavior="onScrollDown"
-        rippleColor="rgba(5,184,63,0.14)"
-        shadowColor="rgba(8, 11, 18, 0.12)"
-        tintColor={colors.brandAction}
       >
-        <NativeTabs.Trigger name="index">
-          <NativeTabs.Trigger.Icon sf={{ default: "house", selected: "house.fill" }} md="home" />
-          <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
-        </NativeTabs.Trigger>
-
-        <NativeTabs.Trigger name="portfolio">
-          <NativeTabs.Trigger.Icon sf={{ default: "chart.pie", selected: "chart.pie.fill" }} md="pie_chart" />
-          <NativeTabs.Trigger.Label>Investments</NativeTabs.Trigger.Label>
-        </NativeTabs.Trigger>
-
-        <NativeTabs.Trigger name="watchlist">
-          <NativeTabs.Trigger.Icon sf={{ default: "eye", selected: "eye.fill" }} md="visibility" />
-          <NativeTabs.Trigger.Label>Watchlist</NativeTabs.Trigger.Label>
-        </NativeTabs.Trigger>
-
-        <NativeTabs.Trigger name="wallet">
-          <NativeTabs.Trigger.Icon sf={{ default: "wallet.pass", selected: "wallet.pass.fill" }} md="wallet" />
-          <NativeTabs.Trigger.Label>Wallet</NativeTabs.Trigger.Label>
-          <NativeTabs.Trigger.Badge hidden />
-        </NativeTabs.Trigger>
-      </NativeTabs>
+        <Tabs.Screen
+          name="index"
+          options={{
+            title: "Home",
+            tabBarIcon: ({ color, focused }) => <House color={color} size={focused ? 25 : 23} strokeWidth={2.4} />,
+          }}
+        />
+        <Tabs.Screen
+          name="portfolio"
+          options={{
+            title: "Investments",
+            tabBarLabel: "Invest",
+            tabBarIcon: ({ color, focused }) => <ChartPie color={color} size={focused ? 25 : 23} strokeWidth={2.4} />,
+          }}
+        />
+        <Tabs.Screen
+          name="watchlist"
+          options={{
+            title: "Watchlist",
+            tabBarIcon: ({ color, focused }) => <Eye color={color} size={focused ? 25 : 23} strokeWidth={2.4} />,
+          }}
+        />
+        <Tabs.Screen
+          name="discover"
+          options={{
+            title: "Discover",
+            tabBarIcon: ({ color, focused }) => <Compass color={color} size={focused ? 25 : 23} strokeWidth={2.4} />,
+          }}
+        />
+        <Tabs.Screen
+          name="wallet"
+          options={{
+            title: "Search",
+            tabBarIcon: ({ color, focused }) => <Search color={color} size={focused ? 25 : 23} strokeWidth={2.4} />,
+          }}
+        />
+      </Tabs>
     </HeaderPanelProvider>
   );
 }

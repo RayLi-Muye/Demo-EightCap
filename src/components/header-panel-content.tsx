@@ -3,7 +3,7 @@ import { Link2 } from "lucide-react-native";
 import type { ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
 
-import { colors, radius, spacing } from "@/design/theme";
+import { colors, radius, spacing, typography } from "@/design/theme";
 
 export type HeaderPanel = "menu" | "promo" | "notifications";
 
@@ -53,7 +53,7 @@ function MenuOption({ label, destructive, onPress }: { label: string; destructiv
         paddingHorizontal: spacing.lg,
       })}
     >
-      <Text style={{ color: destructive ? colors.negative : colors.ink, fontSize: 16, fontWeight: "800" }}>{label}</Text>
+      <Text style={{ color: destructive ? colors.negative : colors.ink, fontSize: 16, fontWeight: "500" }}>{label}</Text>
     </Pressable>
   );
 }
@@ -71,12 +71,12 @@ export function HeaderPanelContent({
   onLogout: () => void;
   rewardLabel?: string;
 }) {
-  const title = activePanel === "menu" ? "EightCap" : activePanel === "promo" ? "Promo" : "Notification";
+  const title = activePanel === "menu" ? "EightCap" : activePanel === "promo" ? "Promo" : "Notifications";
   const rewardAmount = rewardLabel?.replace(/^Earn\s+/i, "") ?? "$200";
 
   return (
     <>
-      {activePanel === "promo" ? null : <Text style={{ color: colors.muted, fontSize: 25, fontWeight: "900" }}>{title}</Text>}
+      {activePanel === "promo" ? null : <Text style={typography.drawerTitle}>{title}</Text>}
 
       {activePanel === "menu" ? (
         <View style={{ gap: spacing.sm }}>
@@ -89,17 +89,17 @@ export function HeaderPanelContent({
       ) : activePanel === "promo" ? (
         <View style={{ alignItems: "center", flexDirection: "row", gap: spacing.md }}>
           <View style={{ flex: 1, minWidth: 0 }}>
-            <Text style={{ color: colors.ink, fontSize: 18, fontWeight: "900" }}>Invite traders</Text>
+            <Text style={{ color: colors.ink, fontSize: 18, fontWeight: "600" }}>Invite traders</Text>
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.xs, marginTop: 5 }}>
-              <Text style={{ color: colors.muted, fontSize: 14, fontWeight: "700" }}>Share invitation link with a</Text>
-              <Text style={{ color: colors.muted, fontSize: 14, fontWeight: "700" }}>friend to earn</Text>
-              <Text style={{ color: colors.brandAction, fontSize: 14, fontVariant: ["tabular-nums"], fontWeight: "900" }}>
+              <Text style={{ color: colors.muted, fontSize: 14, fontWeight: "500" }}>Share invitation link with a</Text>
+              <Text style={{ color: colors.muted, fontSize: 14, fontWeight: "500" }}>friend to earn</Text>
+              <Text style={{ color: colors.brandAction, fontSize: 14, fontVariant: ["tabular-nums"], fontWeight: "600" }}>
                 {rewardAmount}
               </Text>
             </View>
             {inviteCopied ? (
-              <Text style={{ color: colors.brandAction, fontSize: 13, fontWeight: "900", marginTop: spacing.sm }}>
-                邀请链接已复制
+              <Text style={{ color: colors.brandAction, fontSize: 13, fontWeight: "600", marginTop: spacing.sm }}>
+                Invitation link copied successfully
               </Text>
             ) : null}
           </View>
@@ -129,14 +129,14 @@ export function HeaderPanelContent({
       ) : (
         <View style={{ gap: spacing.sm }}>
           <PanelRow dotColor={colors.negative}>
-            <Text style={{ color: colors.ink, fontSize: 17, fontWeight: "900" }}>Portfolio alert</Text>
-            <Text style={{ color: colors.muted, fontSize: 14, fontWeight: "600", marginTop: 3 }}>
+            <Text style={{ color: colors.ink, fontSize: 17, fontWeight: "600" }}>Portfolio alert</Text>
+            <Text style={{ color: colors.muted, fontSize: 14, fontWeight: "500", marginTop: 3 }}>
               Your daily movement crossed the demo threshold.
             </Text>
           </PanelRow>
           <PanelRow dotColor={colors.brandAction}>
-            <Text style={{ color: colors.ink, fontSize: 17, fontWeight: "900" }}>Market pulse</Text>
-            <Text style={{ color: colors.muted, fontSize: 14, fontWeight: "600", marginTop: 3 }}>
+            <Text style={{ color: colors.ink, fontSize: 17, fontWeight: "600" }}>Market pulse</Text>
+            <Text style={{ color: colors.muted, fontSize: 14, fontWeight: "500", marginTop: 3 }}>
               Quote flashes and index updates are running from local mock data.
             </Text>
           </PanelRow>

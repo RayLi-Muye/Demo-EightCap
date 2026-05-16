@@ -159,13 +159,17 @@ export function LaunchSplash() {
   const { height, width } = useWindowDimensions();
   const fade = useSharedValue(1);
   const asciiFrame = useMemo(() => buildAsciiEightFrame(frame), [frame]);
+  const isTablet = width >= 600 && width < 1100;
+  const isTabletLandscape = isTablet && width > height;
   const asciiFontSize =
     width < 600
       ? clamp(Math.min(height * 0.013, width * 0.023), 8, 12)
+      : isTablet
+        ? clamp(Math.min(height * 0.012, width * 0.013), 9, 11.5)
       : clamp(Math.min(height * 0.018, width * 0.018), 12, 16);
-  const stageScale = (width < 390 ? 0.9 : 1) * 1.56;
-  const stageOffsetX = -width * 0.05;
-  const stageOffsetY = width < 600 ? 0 : 72;
+  const stageScale = width < 600 ? (width < 390 ? 0.9 : 1) * 1.56 : isTablet ? 1.59 : 1.56;
+  const stageOffsetX = 0;
+  const stageOffsetY = isTablet ? height * (isTabletLandscape ? 0.01 : -0.02) : width >= 1100 ? 72 : 0;
   const asciiTextWidth = ASCII_COLUMNS * (asciiFontSize + 2);
   const asciiTextHeight = ASCII_ROWS * asciiFontSize * 1.1;
 
@@ -256,6 +260,7 @@ export function LaunchSplash() {
           <Text style={styles.title}>
             Eight Cap <Text style={styles.titleStrong}>prototype</Text>
           </Text>
+          <Text style={styles.subtitle}>By Ray Li</Text>
           <View style={styles.titleRule} />
         </View>
 
@@ -285,7 +290,7 @@ const styles = StyleSheet.create({
   asciiText: {
     color: BRAND_GREEN,
     fontFamily: "Courier",
-    fontWeight: "800",
+    fontWeight: "500",
     includeFontPadding: false,
     letterSpacing: 1.1,
     opacity: 0.9,
@@ -327,7 +332,7 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontFamily: "Courier",
     fontSize: 16,
-    fontWeight: "800",
+    fontWeight: "500",
     letterSpacing: 0.6,
   },
   root: {
@@ -349,12 +354,21 @@ const styles = StyleSheet.create({
   titleRule: {
     backgroundColor: "rgba(45, 187, 105, 0.3)",
     height: 1,
-    marginTop: 14,
+    marginTop: 12,
     width: 48,
   },
   titleStrong: {
     color: BRAND_GREEN,
-    fontWeight: "800",
+    fontWeight: "500",
+  },
+  subtitle: {
+    color: "rgba(45, 187, 105, 0.78)",
+    fontFamily: "Courier",
+    fontSize: 13,
+    fontWeight: "500",
+    letterSpacing: 1.2,
+    marginTop: 8,
+    textAlign: "center",
   },
   titleWrap: {
     alignItems: "center",

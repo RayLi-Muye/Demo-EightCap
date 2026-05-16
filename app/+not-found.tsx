@@ -18,7 +18,7 @@ export default function NotFoundScreen() {
           gap: spacing.md,
         }}
       >
-        <Text selectable style={{ color: colors.ink, fontSize: 22, fontWeight: "700" }}>
+        <Text selectable style={{ color: colors.ink, fontSize: 22, fontWeight: "500" }}>
           Screen not found
         </Text>
 
@@ -32,7 +32,7 @@ export default function NotFoundScreen() {
               paddingVertical: spacing.md,
             })}
           >
-            <Text style={{ color: colors.ink, fontSize: 15, fontWeight: "700" }}>Back to markets</Text>
+            <Text style={{ color: colors.ink, fontSize: 15, fontWeight: "500" }}>Back to markets</Text>
           </Pressable>
         </Link>
       </View>

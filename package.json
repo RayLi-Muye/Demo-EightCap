@@ -7,6 +7,11 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "export:web": "expo export --platform web",
+    "preview:web": "npx serve dist",
+    "vercel-build": "expo export --platform web",
+    "check:market-data": "node scripts/check-market-data.cjs",
+    "verify:web-demo": "node scripts/verify-web-demo.cjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

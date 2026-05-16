@@ -52,7 +52,7 @@ export function MarketIndexStrip() {
               width: ITEM_WIDTH,
             }}
           >
-            <Text numberOfLines={1} selectable style={{ color: colors.muted, fontSize: 12, fontWeight: "900" }}>
+            <Text numberOfLines={1} selectable style={{ color: colors.muted, fontSize: 12, fontWeight: "600" }}>
               {index.symbol}
             </Text>
             <Text
@@ -62,7 +62,7 @@ export function MarketIndexStrip() {
                 color: colors.ink,
                 fontSize: 19,
                 fontVariant: ["tabular-nums"],
-                fontWeight: "900",
+                fontWeight: "600",
                 width: PRICE_WIDTH,
               }}
             >
@@ -75,7 +75,7 @@ export function MarketIndexStrip() {
                 color: index.changePercent >= 0 ? colors.positive : colors.negative,
                 fontSize: 13,
                 fontVariant: ["tabular-nums"],
-                fontWeight: "700",
+                fontWeight: "500",
                 width: PRICE_WIDTH,
               }}
             >

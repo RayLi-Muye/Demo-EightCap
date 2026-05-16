@@ -1,6 +1,6 @@
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import { Bell, ChevronDown, Menu, Search, Sparkles } from "lucide-react-native";
+import { Bell, ChevronDown, Menu, Search, Sparkles, Wallet } from "lucide-react-native";
 import { useState, type ReactNode } from "react";
 import { Pressable, Text, View, useWindowDimensions } from "react-native";
 
@@ -17,6 +17,8 @@ type AppHeaderProps = {
   centerSubLabel?: string;
   rewardLabel?: string;
 };
+
+const notificationCount = 2;
 
 function hapticTap() {
   Haptics.selectionAsync().catch(() => {});
@@ -107,7 +109,7 @@ export function AppHeader({ searchPlaceholder, centerLabel, centerSubLabel, rewa
               }}
             >
               <Search color={colors.muted} size={22} strokeWidth={2.3} />
-              <Text style={{ color: colors.subtle, fontSize: 18, fontWeight: "700" }}>{searchPlaceholder}</Text>
+              <Text style={{ color: colors.subtle, fontSize: 18, fontWeight: "500" }}>{searchPlaceholder}</Text>
             </GlassSurface>
           ) : centerLabel ? (
             <GlassSurface
@@ -127,13 +129,13 @@ export function AppHeader({ searchPlaceholder, centerLabel, centerSubLabel, rewa
               }}
             >
               <View style={{ alignItems: "center", flexDirection: "row", gap: spacing.xs }}>
-                <Text selectable style={{ color: colors.ink, fontSize: 18, fontVariant: ["tabular-nums"], fontWeight: "800" }}>
+                <Text selectable style={{ color: colors.ink, fontSize: 18, fontVariant: ["tabular-nums"], fontWeight: "500" }}>
                   {centerLabel}
                 </Text>
                 <ChevronDown color={colors.subtle} size={15} strokeWidth={2.4} />
               </View>
               {centerSubLabel ? (
-                <Text selectable style={{ color: colors.negative, fontSize: 12, fontVariant: ["tabular-nums"], fontWeight: "800" }}>
+                <Text selectable style={{ color: colors.negative, fontSize: 12, fontVariant: ["tabular-nums"], fontWeight: "500" }}>
                   {centerSubLabel}
                 </Text>
               ) : null}
@@ -161,6 +163,10 @@ export function AppHeader({ searchPlaceholder, centerLabel, centerSubLabel, rewa
             </View>
           </IconButton>
 
+          <IconButton label="Open wallet" onPress={() => router.push("/wallet")}>
+            <Wallet color={colors.muted} size={23} strokeWidth={2.35} />
+          </IconButton>
+
           <IconButton label="Open notifications" onPress={() => openPanel("notifications")}>
             <View>
               <Bell color={colors.ink} fill={colors.ink} size={24} strokeWidth={2.3} />
@@ -179,7 +185,7 @@ export function AppHeader({ searchPlaceholder, centerLabel, centerSubLabel, rewa
                   width: 22,
                 }}
               >
-                <Text style={{ color: colors.inverse, fontSize: 12, fontWeight: "900" }}>1</Text>
+                <Text style={{ color: colors.inverse, fontSize: 12, fontWeight: "600" }}>{notificationCount}</Text>
               </View>
             </View>
           </IconButton>

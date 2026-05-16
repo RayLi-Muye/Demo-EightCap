@@ -31,7 +31,7 @@ export function AssetLogo({ label, background, color, size = 48 }: AssetLogoProp
         style={{
           color,
           fontSize: compact ? size * 0.22 : size * 0.38,
-          fontWeight: "900",
+          fontWeight: "600",
           letterSpacing: 0,
           maxWidth: size - 8,
           textAlign: "center",

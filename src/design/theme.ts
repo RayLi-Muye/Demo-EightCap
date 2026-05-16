@@ -1,3 +1,5 @@
+import type { TextStyle } from "react-native";
+
 export const colors = {
   canvas: "#f5f8f4",
   surface: "#ffffff",
@@ -45,3 +47,50 @@ export const shadows = {
     boxShadow: "0 2px 8px rgba(16, 20, 17, 0.08)",
   },
 } as const;
+
+export const fontFamilies = {
+  pageTitle: process.env.EXPO_OS === "web" ? "SpaceMono-Regular, Space Mono, monospace" : "SpaceMono-Regular",
+  pageTitleBold: process.env.EXPO_OS === "web" ? "SpaceMono-Bold, Space Mono, monospace" : "SpaceMono-Bold",
+};
+
+const webDisplayFont =
+  process.env.EXPO_OS === "web"
+    ? {
+        fontFamily: "Manrope, Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
+      }
+    : {};
+
+export const typography = {
+  pageTitle: {
+    color: colors.ink,
+    fontFamily: fontFamilies.pageTitle,
+    fontSize: 31,
+    fontWeight: "400",
+    letterSpacing: 0,
+    lineHeight: 37,
+  } satisfies TextStyle,
+  pageTitleLarge: {
+    color: colors.ink,
+    fontFamily: fontFamilies.pageTitle,
+    fontSize: 32,
+    fontWeight: "400",
+    letterSpacing: 0,
+    lineHeight: 38,
+  } satisfies TextStyle,
+  drawerTitle: {
+    color: colors.muted,
+    fontFamily: fontFamilies.pageTitle,
+    fontSize: 24,
+    fontWeight: "400",
+    letterSpacing: 0,
+    lineHeight: 31,
+  } satisfies TextStyle,
+  sectionTitle: {
+    ...webDisplayFont,
+    color: colors.ink,
+    fontSize: 18,
+    fontWeight: "500",
+    letterSpacing: 0,
+    lineHeight: 23,
+  } satisfies TextStyle,
+};
