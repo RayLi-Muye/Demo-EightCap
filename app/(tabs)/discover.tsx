@@ -2,7 +2,7 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { ChevronRight, Flame, Newspaper, Search, TrendingUp, X } from "lucide-react-native";
 import { useMemo, useRef, useState } from "react";
-import { ImageBackground, Pressable, ScrollView, Text, TextInput, View, useWindowDimensions } from "react-native";
+import { ImageBackground, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 
 import { AssetLogo } from "@/components/asset-logo";
@@ -13,6 +13,7 @@ import { ScreenScroll } from "@/components/screen-scroll";
 import { Sparkline } from "@/components/sparkline";
 import { holdings, watchlistAssets, type EquityAsset } from "@/data/portfolio";
 import { colors, radius, shadows, spacing } from "@/design/theme";
+import { useAppViewportDimensions } from "@/hooks/use-app-viewport";
 import { useLiveAssets } from "@/hooks/use-live-market";
 import { formatPercent, formatPrice } from "@/utils/format";
 
@@ -402,7 +403,7 @@ function BusinessArticleCard({ article, width }: { article: BusinessArticle; wid
 }
 
 export default function DiscoverScreen() {
-  const { width } = useWindowDimensions();
+  const { width } = useAppViewportDimensions();
   const inputRef = useRef<TextInput>(null);
   const [activeSector, setActiveSector] = useState<Sector>("All");
   const [searchFocused, setSearchFocused] = useState(false);
@@ -441,53 +442,70 @@ export default function DiscoverScreen() {
               <PageTitle style={{ flex: 1 }}>Discover</PageTitle>
             )}
 
-            <Pressable
-              accessibilityLabel="Search discover"
-              accessibilityRole="button"
-              onPress={openSearch}
-              style={({ pressed }) => ({
-                flex: searchFocused ? 1 : undefined,
-                opacity: pressed ? 0.72 : 1,
-              })}
-            >
-              <GlassSurface
-                interactive
-                style={{
-                  alignItems: "center",
-                  backgroundColor: searchFocused ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.62)",
-                  borderColor: searchFocused ? "rgba(5,184,63,0.32)" : "rgba(255,255,255,0.78)",
-                  borderRadius: searchFocused ? radius.lg : radius.full,
-                  borderWidth: 1,
-                  flexDirection: "row",
-                  gap: spacing.sm,
-                  height: 48,
-                  justifyContent: searchFocused ? undefined : "center",
-                  paddingHorizontal: searchFocused ? spacing.lg : 0,
-                  width: searchFocused ? "100%" : 48,
-                }}
+            {searchFocused ? (
+              <View style={{ flex: 1 }}>
+                <GlassSurface
+                  interactive
+                  style={{
+                    alignItems: "center",
+                    backgroundColor: "rgba(255,255,255,0.82)",
+                    borderColor: "rgba(5,184,63,0.32)",
+                    borderRadius: radius.lg,
+                    borderWidth: 1,
+                    flexDirection: "row",
+                    gap: spacing.sm,
+                    height: 48,
+                    paddingHorizontal: spacing.lg,
+                    width: "100%",
+                  }}
+                >
+                  <Search color={colors.brandAction} size={21} strokeWidth={2.4} />
+                  <TextInput
+                    autoCapitalize="characters"
+                    autoCorrect={false}
+                    onBlur={() => setSearchFocused(false)}
+                    onChangeText={setQuery}
+                    placeholder="Search assets, sectors..."
+                    placeholderTextColor={colors.subtle}
+                    ref={inputRef}
+                    returnKeyType="search"
+                    style={[{ color: colors.ink, flex: 1, fontSize: 15, fontWeight: "500" }, { outlineStyle: "none" } as never]}
+                    value={query}
+                  />
+                  <Pressable accessibilityLabel="Clear search" accessibilityRole="button" hitSlop={10} onPress={closeSearch}>
+                    <X color={colors.muted} size={18} strokeWidth={2.5} />
+                  </Pressable>
+                </GlassSurface>
+              </View>
+            ) : (
+              <Pressable
+                accessibilityLabel="Search discover"
+                accessibilityRole="button"
+                onPress={openSearch}
+                style={({ pressed }) => ({
+                  opacity: pressed ? 0.72 : 1,
+                })}
               >
-                <Search color={searchFocused ? colors.brandAction : colors.muted} size={21} strokeWidth={2.4} />
-                {searchFocused ? (
-                  <>
-                    <TextInput
-                      autoCapitalize="characters"
-                      autoCorrect={false}
-                      onBlur={() => setSearchFocused(false)}
-                      onChangeText={setQuery}
-                      placeholder="Search assets, sectors..."
-                      placeholderTextColor={colors.subtle}
-                      ref={inputRef}
-                      returnKeyType="search"
-                      style={{ color: colors.ink, flex: 1, fontSize: 15, fontWeight: "500" }}
-                      value={query}
-                    />
-                    <Pressable accessibilityLabel="Clear search" accessibilityRole="button" hitSlop={10} onPress={closeSearch}>
-                      <X color={colors.muted} size={18} strokeWidth={2.5} />
-                    </Pressable>
-                  </>
-                ) : null}
-              </GlassSurface>
-            </Pressable>
+                <GlassSurface
+                  interactive
+                  style={{
+                    alignItems: "center",
+                    backgroundColor: "rgba(255,255,255,0.62)",
+                    borderColor: "rgba(255,255,255,0.78)",
+                    borderRadius: radius.full,
+                    borderWidth: 1,
+                    flexDirection: "row",
+                    gap: spacing.sm,
+                    height: 48,
+                    justifyContent: "center",
+                    paddingHorizontal: 0,
+                    width: 48,
+                  }}
+                >
+                  <Search color={colors.muted} size={21} strokeWidth={2.4} />
+                </GlassSurface>
+              </Pressable>
+            )}
           </View>
 
           <View style={{ gap: spacing.md }}>

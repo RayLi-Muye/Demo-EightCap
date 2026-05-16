@@ -1,13 +1,13 @@
-import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 import { ChartPie, Compass, Eye, House, Search, Wallet, X } from "lucide-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Platform, Pressable, Text, TextInput, View, useWindowDimensions } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 
 import { holdings, watchlistAssets, type EquityAsset } from "@/data/portfolio";
 import { colors, radius, spacing } from "@/design/theme";
+import { useAppViewportDimensions } from "@/hooks/use-app-viewport";
 
 const tabIcons = {
   discover: Compass,
@@ -37,14 +37,24 @@ function uniqueAssets() {
 export function SearchTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
+  const { width } = useAppViewportDimensions();
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<TextInput>(null);
   const tabWidth = Math.min(Math.max(width - 32, 0), 620);
-  const floatingPosition = (Platform.OS === "web" ? "fixed" : "absolute") as "absolute";
-  const floatingFrameWidth = Platform.OS === "web" ? "calc(100% - 32px)" : tabWidth;
+  const floatingPosition = "absolute";
+  const floatingFrameWidth = tabWidth;
+  const floatingShellStyle = {
+    left: 0,
+    right: 0,
+  };
   const searchButtonSize = 74;
+  const primaryBarWidth = Math.max(tabWidth - searchButtonSize - spacing.sm, 0);
+  const primaryButtonWidth = primaryBarWidth / primaryRouteNames.length;
+  const navGlassStyle = {
+    backgroundColor: "rgba(246,249,245,0.46)",
+    backdropFilter: "blur(24px)",
+  };
   const assets = useMemo(uniqueAssets, []);
   const results = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -84,10 +94,9 @@ export function SearchTabBar({ descriptors, navigation, state }: BottomTabBarPro
         style={{
           alignItems: "center",
           bottom: 14 + insets.bottom,
-          left: 0,
           position: floatingPosition,
-          right: 0,
           zIndex: 80,
+          ...floatingShellStyle,
         }}
       >
         {results.length > 0 ? (
@@ -150,14 +159,10 @@ export function SearchTabBar({ descriptors, navigation, state }: BottomTabBarPro
           </View>
         ) : null}
 
-        <BlurView
-          intensity={96}
-          tint="systemUltraThinMaterial"
+        <View
           style={{
-            backgroundColor: "rgba(255,255,255,0.76)",
-            borderColor: "rgba(255,255,255,0.84)",
+            ...navGlassStyle,
             borderRadius: radius.full,
-            borderWidth: 1,
             boxShadow: "0 18px 42px rgba(8, 11, 18, 0.16)",
             flexDirection: "row",
             height: 64,
@@ -178,7 +183,7 @@ export function SearchTabBar({ descriptors, navigation, state }: BottomTabBarPro
               placeholderTextColor={colors.subtle}
               ref={inputRef}
               returnKeyType="search"
-              style={{ color: colors.ink, flex: 1, fontSize: 17, fontWeight: "500" }}
+              style={[{ color: colors.ink, flex: 1, fontSize: 17, fontWeight: "500" }, { outlineStyle: "none" } as never]}
               value={query}
             />
             <Pressable
@@ -199,7 +204,7 @@ export function SearchTabBar({ descriptors, navigation, state }: BottomTabBarPro
               <X color={colors.muted} size={20} strokeWidth={2.5} />
             </Pressable>
           </View>
-        </BlurView>
+        </View>
       </View>
     );
   }
@@ -213,10 +218,9 @@ export function SearchTabBar({ descriptors, navigation, state }: BottomTabBarPro
       style={{
         alignItems: "center",
         bottom: 14 + insets.bottom,
-        left: 0,
         position: floatingPosition,
-        right: 0,
         zIndex: 80,
+        ...floatingShellStyle,
       }}
     >
       <View
@@ -230,28 +234,14 @@ export function SearchTabBar({ descriptors, navigation, state }: BottomTabBarPro
       >
       <View
         style={{
-          backgroundColor: "rgba(255,255,255,0.46)",
-          borderColor: "rgba(255,255,255,0.74)",
+          ...navGlassStyle,
           borderRadius: radius.full,
-          borderWidth: 1,
           boxShadow: "0 18px 42px rgba(8, 11, 18, 0.16)",
-          flex: 1,
           height: 74,
           overflow: "hidden",
+          width: primaryBarWidth,
         }}
       >
-        <BlurView
-          intensity={96}
-          tint="systemUltraThinMaterial"
-          style={{
-            backgroundColor: "rgba(255,255,255,0.46)",
-            bottom: 0,
-            left: 0,
-            position: "absolute",
-            right: 0,
-            top: 0,
-          }}
-        />
         <View style={{ flex: 1, flexDirection: "row", paddingBottom: 8, paddingTop: 8 }}>
           {primaryRoutes.map((route) => {
             const routeIndex = state.routes.findIndex((stateRoute) => stateRoute.key === route.key);
@@ -280,10 +270,10 @@ export function SearchTabBar({ descriptors, navigation, state }: BottomTabBarPro
                 }}
                 style={({ pressed }) => ({
                   alignItems: "center",
-                  flex: 1,
                   justifyContent: "center",
                   minWidth: 0,
                   opacity: pressed ? 0.65 : 1,
+                  width: primaryButtonWidth,
                 })}
               >
                 <Icon color={color} size={isFocused ? 25 : 23} strokeWidth={2.4} />
@@ -305,15 +295,11 @@ export function SearchTabBar({ descriptors, navigation, state }: BottomTabBarPro
       </View>
 
       {searchRoute ? (
-        <BlurView
-          intensity={96}
-          tint="systemUltraThinMaterial"
+        <View
           style={{
+            ...navGlassStyle,
             alignItems: "center",
-            backgroundColor: "rgba(255,255,255,0.58)",
-            borderColor: "rgba(255,255,255,0.78)",
             borderRadius: radius.full,
-            borderWidth: 1,
             boxShadow: "0 18px 42px rgba(8, 11, 18, 0.16)",
             height: 74,
             justifyContent: "center",
@@ -346,7 +332,7 @@ export function SearchTabBar({ descriptors, navigation, state }: BottomTabBarPro
               Search
             </Text>
           </Pressable>
-        </BlurView>
+        </View>
       ) : null}
       </View>
     </View>

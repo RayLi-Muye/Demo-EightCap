@@ -1,12 +1,13 @@
 import * as Haptics from "expo-haptics";
 import { ArrowRightLeft, Minus, Plus, Wallet } from "lucide-react-native";
 import { useState } from "react";
-import { Pressable, Text, View, useWindowDimensions } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
 
 import type { WalletAccount } from "@/data/portfolio";
 import { colors, radius, shadows, spacing } from "@/design/theme";
+import { useAppViewportDimensions } from "@/hooks/use-app-viewport";
 import { depositWalletFunds, transferWalletFunds, withdrawWalletFunds } from "@/hooks/use-demo-portfolio";
 import { formatCurrency } from "@/utils/format";
 
@@ -59,7 +60,7 @@ function getOperationAmount(actionId: WalletActionId, account: WalletAccount) {
 
 export function WalletFloatingActions({ account, expanded, onExpandedChange }: WalletFloatingActionsProps) {
   const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
+  const { width } = useAppViewportDimensions();
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const tabWidth = Math.min(Math.max(width - 32, 0), 620);
   const isWide = width >= 768;

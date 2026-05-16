@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import 'react-native-reanimated';
 
 import { LaunchSplash } from "@/components/launch-splash";
+import { WebPhonePreviewShell } from "@/components/web-phone-preview-shell";
 import { colors } from "@/design/theme";
 
 export {
@@ -45,7 +46,7 @@ export default function RootLayout() {
     }
   }, [fontError, fontsLoaded]);
 
-  return (
+  const app = (
     <ThemeProvider value={navigationTheme}>
       <Stack
         screenOptions={{
@@ -67,4 +68,6 @@ export default function RootLayout() {
       <LaunchSplash />
     </ThemeProvider>
   );
+
+  return <WebPhonePreviewShell>{app}</WebPhonePreviewShell>;
 }

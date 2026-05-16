@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
-import { ScrollView, type ScrollViewProps, View, useWindowDimensions } from "react-native";
+import { ScrollView, type ScrollViewProps, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors, spacing } from "@/design/theme";
+import { useAppViewportDimensions } from "@/hooks/use-app-viewport";
 
 type ScreenScrollProps = {
   children: ReactNode;
@@ -13,7 +14,7 @@ type ScreenScrollProps = {
 };
 
 export function ScreenScroll({ children, refreshControl, includeTopInset, bottomInset = 36, maxContentWidth }: ScreenScrollProps) {
-  const { width } = useWindowDimensions();
+  const { width } = useAppViewportDimensions();
   const insets = useSafeAreaInsets();
   const isWide = width >= 768;
 

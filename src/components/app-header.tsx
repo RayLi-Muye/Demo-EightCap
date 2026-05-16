@@ -2,10 +2,11 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { Bell, ChevronDown, Menu, Search, Sparkles, Wallet } from "lucide-react-native";
 import { useState, type ReactNode } from "react";
-import { Pressable, Text, View, useWindowDimensions } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 import { showLaunchSplash } from "@/components/launch-splash";
 import { colors, radius, shadows, spacing } from "@/design/theme";
+import { useAppViewportDimensions } from "@/hooks/use-app-viewport";
 
 import { GlassSurface } from "./glass-surface";
 import { useHeaderPanelController } from "./header-panel-provider";
@@ -46,15 +47,14 @@ function IconButton({ children, label, onPress }: { children: ReactNode; label: 
     >
       <GlassSurface
         interactive
-        intensity={100}
-        tintColor="rgba(255,255,255,0.88)"
+        intensity={72}
+        tintColor="rgba(255,255,255,0.62)"
         style={{
           ...shadows.card,
           alignItems: "center",
-          backgroundColor: "rgba(255,255,255,0.76)",
-          borderColor: "rgba(255,255,255,0.92)",
+          backgroundColor: "rgba(255,255,255,0.42)",
           borderRadius: radius.full,
-          borderWidth: 1,
+          borderWidth: 0,
           height: 48,
           justifyContent: "center",
           width: 48,
@@ -69,7 +69,7 @@ function IconButton({ children, label, onPress }: { children: ReactNode; label: 
 export function AppHeader({ searchPlaceholder, centerLabel, centerSubLabel, rewardLabel }: AppHeaderProps) {
   const router = useRouter();
   const headerPanelController = useHeaderPanelController();
-  const { width } = useWindowDimensions();
+  const { width } = useAppViewportDimensions();
   const compact = width < 380;
   const [panel, setPanel] = useState<HeaderPanel | null>(null);
   const openPanel = (nextPanel: HeaderPanel) => {
@@ -92,14 +92,13 @@ export function AppHeader({ searchPlaceholder, centerLabel, centerSubLabel, rewa
           {searchPlaceholder ? (
             <GlassSurface
               interactive
-              intensity={90}
-              tintColor="rgba(255,255,255,0.7)"
+              intensity={68}
+              tintColor="rgba(255,255,255,0.48)"
               style={{
                 alignItems: "center",
-                backgroundColor: "rgba(255,255,255,0.56)",
-                borderColor: "rgba(255,255,255,0.76)",
+                backgroundColor: "rgba(255,255,255,0.34)",
                 borderRadius: radius.full,
-                borderWidth: 1,
+                borderWidth: 0,
                 flex: 1,
                 flexDirection: "row",
                 gap: spacing.sm,
@@ -114,14 +113,13 @@ export function AppHeader({ searchPlaceholder, centerLabel, centerSubLabel, rewa
           ) : centerLabel ? (
             <GlassSurface
               interactive
-              intensity={88}
-              tintColor="rgba(255,255,255,0.72)"
+              intensity={68}
+              tintColor="rgba(255,255,255,0.48)"
               style={{
                 alignItems: "center",
-                backgroundColor: "rgba(255,255,255,0.56)",
-                borderColor: "rgba(255,255,255,0.76)",
+                backgroundColor: "rgba(255,255,255,0.34)",
                 borderRadius: radius.full,
-                borderWidth: 1,
+                borderWidth: 0,
                 gap: 1,
                 minHeight: 50,
                 paddingHorizontal: spacing.lg,

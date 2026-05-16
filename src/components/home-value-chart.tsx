@@ -1,7 +1,7 @@
 import * as Haptics from "expo-haptics";
 import { ArrowDownToLine, ArrowUpFromLine, Eye, EyeOff, Maximize2, Minimize2 } from "lucide-react-native";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, Text, View, useWindowDimensions } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Animated, {
   Easing,
   FadeInUp,
@@ -15,7 +15,8 @@ import Animated, {
 import { PageTitle } from "@/components/page-title";
 import { homeRangeDeltas, type HomeChartRange } from "@/data/portfolio";
 import { colors, radius, spacing } from "@/design/theme";
-import { useDemoAccountSummary } from "@/hooks/use-demo-portfolio";
+import { useAppViewportDimensions } from "@/hooks/use-app-viewport";
+import { depositWalletFunds, useDemoAccountSummary, withdrawWalletFunds } from "@/hooks/use-demo-portfolio";
 import { formatCurrency, formatPercent, formatSignedCurrency } from "@/utils/format";
 
 import { Sparkline, type SparklineDatum } from "./sparkline";
@@ -63,7 +64,17 @@ function AccountMetric({ compact, label, value }: { compact: boolean; label: str
   );
 }
 
-function FundsActionButton({ compact, label, variant }: { compact: boolean; label: string; variant: "primary" | "secondary" }) {
+function FundsActionButton({
+  compact,
+  label,
+  onPress,
+  variant,
+}: {
+  compact: boolean;
+  label: string;
+  onPress: () => void;
+  variant: "primary" | "secondary";
+}) {
   const primary = variant === "primary";
   const Icon = variant === "primary" ? ArrowDownToLine : ArrowUpFromLine;
 
@@ -73,6 +84,7 @@ function FundsActionButton({ compact, label, variant }: { compact: boolean; labe
       accessibilityRole="button"
       onPress={() => {
         Haptics.selectionAsync().catch(() => {});
+        onPress();
       }}
       style={({ pressed }) => ({
         alignItems: "center",
@@ -182,13 +194,14 @@ function TimeSlotControl({
 }
 
 export function HomeValueChart() {
-  const { width } = useWindowDimensions();
+  const { width } = useAppViewportDimensions();
   const isPad = width >= 768;
   const accountSummary = useDemoAccountSummary();
   const [range, setRange] = useState<HomeChartRange>("daily");
   const [liveOffset, setLiveOffset] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [fundsStatus, setFundsStatus] = useState<string | null>(null);
   const tickRef = useRef(0);
   const chartHeightValue = useSharedValue(isPad ? 181 : 150);
   const expandedProgress = useSharedValue(0);
@@ -227,7 +240,7 @@ export function HomeValueChart() {
   const collapsedChartHeight = isPad ? 181 : 150;
   const expandedChartHeight = isPad ? 210 : 174;
   const chartHeight = expanded ? expandedChartHeight : collapsedChartHeight;
-  const expandedPanelHeight = isPad ? 126 : 122;
+  const expandedPanelHeight = isPad ? 152 : 148;
 
   useEffect(() => {
     chartHeightValue.value = withTiming(expanded ? expandedChartHeight : collapsedChartHeight, {
@@ -257,6 +270,20 @@ export function HomeValueChart() {
   const expandedPanelInnerStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: (1 - expandedProgress.value) * -8 }],
   }));
+
+  function handleFundsAction(action: "deposit" | "withdraw") {
+    const amount = action === "deposit" ? 500 : 250;
+    const nextAccount = action === "deposit" ? depositWalletFunds("USD", amount) : withdrawWalletFunds("USD", amount);
+
+    if (!nextAccount) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning).catch(() => {});
+      setFundsStatus("USD account does not have enough available cash to withdraw.");
+      return;
+    }
+
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    setFundsStatus(action === "deposit" ? "Deposited $500.00 to USD account." : "Withdrew $250.00 from USD account.");
+  }
 
   return (
     <Animated.View
@@ -393,10 +420,16 @@ export function HomeValueChart() {
             </View>
             <View style={{ alignSelf: "stretch", backgroundColor: "rgba(8,11,18,0.12)", width: 1 }} />
             <View style={{ flexDirection: "row", flexShrink: 0, gap: spacing.sm }}>
-              <FundsActionButton compact={!isPad} label="Deposit" variant="primary" />
-              <FundsActionButton compact={!isPad} label="Withdraw" variant="secondary" />
+              <FundsActionButton compact={!isPad} label="Deposit" onPress={() => handleFundsAction("deposit")} variant="primary" />
+              <FundsActionButton compact={!isPad} label="Withdraw" onPress={() => handleFundsAction("withdraw")} variant="secondary" />
             </View>
           </View>
+
+          {fundsStatus ? (
+            <Text selectable numberOfLines={2} style={{ color: colors.brandAction, fontSize: 12, fontWeight: "500", lineHeight: 17, textAlign: "center" }}>
+              {fundsStatus}
+            </Text>
+          ) : null}
         </Animated.View>
       </Animated.View>
     </Animated.View>

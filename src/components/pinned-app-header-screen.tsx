@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
-import { View, useWindowDimensions } from "react-native";
+import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AppHeader } from "@/components/app-header";
 import { colors, spacing } from "@/design/theme";
+import { useAppViewportDimensions } from "@/hooks/use-app-viewport";
 
 type PinnedAppHeaderScreenProps = {
   children: ReactNode;
@@ -11,7 +12,7 @@ type PinnedAppHeaderScreenProps = {
 
 export function PinnedAppHeaderScreen({ children }: PinnedAppHeaderScreenProps) {
   const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
+  const { width } = useAppViewportDimensions();
   const isWide = width >= 768;
   const horizontalPadding = isWide ? spacing.xl : spacing.lg;
   const headerHeight = insets.top + 72;
@@ -20,9 +21,7 @@ export function PinnedAppHeaderScreen({ children }: PinnedAppHeaderScreenProps) 
     <View style={{ backgroundColor: colors.canvas, flex: 1 }}>
       <View
         style={{
-          backgroundColor: "rgba(245,248,244,0.88)",
-          borderBottomColor: "rgba(230,234,240,0.42)",
-          borderBottomWidth: 1,
+          backgroundColor: "rgba(245,248,244,0.54)",
           left: 0,
           paddingBottom: spacing.sm,
           paddingHorizontal: horizontalPadding,

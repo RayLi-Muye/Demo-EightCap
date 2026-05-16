@@ -1,6 +1,6 @@
 import { ArrowRight } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import Animated, {
   Easing,
   runOnJS,
@@ -8,6 +8,8 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
+
+import { useAppViewportDimensions } from "@/hooks/use-app-viewport";
 
 const ASCII_COLUMNS = 82;
 const ASCII_ROWS = 50;
@@ -156,20 +158,23 @@ export function LaunchSplash() {
   const [frame, setFrame] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [autoHide, setAutoHide] = useState(false);
-  const { height, width } = useWindowDimensions();
+  const { height, width } = useAppViewportDimensions();
   const fade = useSharedValue(1);
   const asciiFrame = useMemo(() => buildAsciiEightFrame(frame), [frame]);
   const isTablet = width >= 600 && width < 1100;
   const isTabletLandscape = isTablet && width > height;
+  const isPhone = width < 600;
   const asciiFontSize =
-    width < 600
-      ? clamp(Math.min(height * 0.013, width * 0.023), 8, 12)
+    isPhone
+      ? clamp(Math.min(height * 0.011, width * 0.019), 7.2, 9.4)
       : isTablet
         ? clamp(Math.min(height * 0.012, width * 0.013), 9, 11.5)
       : clamp(Math.min(height * 0.018, width * 0.018), 12, 16);
-  const stageScale = width < 600 ? (width < 390 ? 0.9 : 1) * 1.56 : isTablet ? 1.59 : 1.56;
+  const baseStageScale = isPhone ? (width < 390 ? 0.88 : 0.98) : isTablet ? 1.32 : 1.56;
+  const stageScale = isPhone ? baseStageScale * 1.5 : isTablet && !isTabletLandscape ? baseStageScale * 1.375 : baseStageScale;
   const stageOffsetX = 0;
-  const stageOffsetY = isTablet ? height * (isTabletLandscape ? 0.01 : -0.02) : width >= 1100 ? 72 : 0;
+  const baseStageOffsetY = (isPhone ? height * 0.035 : isTablet ? height * (isTabletLandscape ? 0.01 : -0.02) : width >= 1100 ? 72 : 0) - height * 0.05;
+  const stageOffsetY = baseStageOffsetY + (isTablet ? height * (isTabletLandscape ? 0.05 : 0.1) : 0);
   const asciiTextWidth = ASCII_COLUMNS * (asciiFontSize + 2);
   const asciiTextHeight = ASCII_ROWS * asciiFontSize * 1.1;
 
@@ -225,6 +230,7 @@ export function LaunchSplash() {
         runOnJS(setIsVisible)(false);
       }
     });
+    setTimeout(() => setIsVisible(false), 520);
   }
 
   const containerStyle = useAnimatedStyle(() => ({
@@ -311,16 +317,16 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "space-between",
-    paddingBottom: 48,
+    paddingBottom: 56,
     paddingHorizontal: 32,
-    paddingTop: 60,
+    paddingTop: 88,
     zIndex: 2,
   },
   enterButton: {
     backgroundColor: BRAND_GREEN,
     borderRadius: 30,
     height: 58,
-    maxWidth: 384,
+    maxWidth: 352,
     overflow: "hidden",
     width: "100%",
   },

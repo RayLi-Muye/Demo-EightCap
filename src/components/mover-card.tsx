@@ -2,7 +2,7 @@ import * as Haptics from "expo-haptics";
 import { Link } from "expo-router";
 import { ArrowDownRight, ArrowUpRight } from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
-import { Pressable, Text, View, useWindowDimensions } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import Animated, {
   FadeInUp,
   useAnimatedStyle,
@@ -16,6 +16,7 @@ import Animated, {
 import type { EquityAsset } from "@/data/portfolio";
 import { watchlistAssets } from "@/data/portfolio";
 import { colors, radius, spacing } from "@/design/theme";
+import { useAppViewportDimensions } from "@/hooks/use-app-viewport";
 import type { PricePulse } from "@/hooks/use-live-market";
 import { useLiveAssets } from "@/hooks/use-live-market";
 import { formatPercent, formatPrice } from "@/utils/format";
@@ -142,7 +143,7 @@ function MoverRow({ asset, compact, index, pulse }: MoverRowProps) {
 }
 
 export function MoverCard() {
-  const { width } = useWindowDimensions();
+  const { width } = useAppViewportDimensions();
   const isPad = width >= 768;
   const compact = !isPad;
   const itemCount = isPad ? 5 : 4;

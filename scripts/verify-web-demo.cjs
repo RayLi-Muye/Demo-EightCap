@@ -108,6 +108,24 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function closeServer(server) {
+  if (!server) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => server.close(resolve));
+}
+
+function waitForProcessExit(processHandle) {
+  if (processHandle.exitCode !== null || processHandle.signalCode !== null) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    processHandle.once("exit", resolve);
+  });
+}
+
 async function waitForDevtools(portNumber) {
   const deadline = Date.now() + 10_000;
 
@@ -286,14 +304,15 @@ async function runDesktopNavigationVerification(client) {
   });
 
   await navigate(client, "/discover");
-  await waitFor(client, `document.body.innerText.includes('Discover')`, "desktop discover route");
+  await waitFor(client, `document.querySelector('iframe')?.contentDocument?.body?.innerText.includes('Discover')`, "desktop discover preview route");
 
   const navState = await evaluate(
     client,
     `(() => {
+      const frameDocument = document.querySelector('iframe')?.contentDocument;
       const labels = ['Home tab', 'Invest tab', 'Watchlist tab', 'Discover tab', 'Search tab'];
       return labels.map((label) => {
-        const nodes = [...document.querySelectorAll('[aria-label="' + label + '"]')];
+        const nodes = [...(frameDocument?.querySelectorAll('[aria-label="' + label + '"]') ?? [])];
         const candidates = nodes.map((candidate) => {
           const rect = candidate.getBoundingClientRect();
           const parent = candidate.parentElement?.getBoundingClientRect();
@@ -327,7 +346,13 @@ async function runDesktopNavigationVerification(client) {
     })()`,
   );
 
-  const viewport = await evaluate(client, `({ height: window.innerHeight, width: window.innerWidth })`);
+  const viewport = await evaluate(client, `(() => {
+    const frameDocument = document.querySelector('iframe')?.contentDocument;
+    return {
+      height: frameDocument?.documentElement?.clientHeight ?? 0,
+      width: frameDocument?.documentElement?.clientWidth ?? 0,
+    };
+  })()`);
   const missing = navState.filter((item) => !item.exists).map((item) => item.label);
   assert(missing.length === 0, `Desktop navigation missing labels: ${missing.join(", ")}`);
   navState.forEach((item) => {
@@ -335,6 +360,131 @@ async function runDesktopNavigationVerification(client) {
     assert(item.top >= 0 && item.bottom <= viewport.height, `${item.label} should be inside the desktop viewport: ${JSON.stringify(item)}`);
     assert(item.left >= 0 && item.right <= viewport.width, `${item.label} should be inside the desktop viewport width: ${JSON.stringify(item)}`);
   });
+}
+
+async function runWideTouchShellVerification(client) {
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    deviceScaleFactor: 1,
+    height: 1536,
+    mobile: true,
+    width: 1078,
+  });
+  await client.send("Emulation.setTouchEmulationEnabled", {
+    enabled: true,
+    maxTouchPoints: 5,
+  });
+
+  await navigate(client, "/");
+  await waitFor(client, `document.querySelector('iframe')?.contentDocument?.body?.innerText.includes('Enter App')`, "wide touch preview frame");
+  await evaluate(client, `document.querySelector('iframe')?.contentDocument?.querySelector('[aria-label="Enter main interface"]')?.click()`);
+  await waitFor(client, `document.querySelector('iframe')?.contentDocument?.body?.innerText.includes('Cash and Holding')`, "wide touch frame home");
+
+  const shellState = await evaluate(
+    client,
+    `(() => {
+      const shell = document.querySelector('iframe')?.getBoundingClientRect();
+      const frameDocument = document.querySelector('iframe')?.contentDocument;
+      const labels = ['Home tab', 'Invest tab', 'Watchlist tab', 'Discover tab', 'Search tab'];
+      return {
+        shell: shell ? {
+          bottom: shell.bottom,
+          height: shell.height,
+          left: shell.left,
+          right: shell.right,
+          top: shell.top,
+          width: shell.width,
+        } : null,
+        viewport: frameDocument ? {
+          height: frameDocument.documentElement.clientHeight,
+          width: frameDocument.documentElement.clientWidth,
+        } : null,
+        tabs: labels.map((label) => {
+          const node = frameDocument?.querySelector('[aria-label="' + label + '"]');
+          const rect = node?.getBoundingClientRect();
+          return {
+            label,
+            rect: rect ? {
+              bottom: rect.bottom,
+              height: rect.height,
+              left: rect.left,
+              right: rect.right,
+              top: rect.top,
+              width: rect.width,
+            } : null,
+          };
+        }),
+      };
+    })()`,
+  );
+
+  assert(shellState.shell, "Wide touch preview should have an app shell.");
+  assert(shellState.viewport, "Wide touch preview should expose an iframe viewport.");
+  assert(Math.abs(shellState.shell.width - 430) < 1, `Wide touch shell should render at 430px wide: ${JSON.stringify(shellState.shell)}`);
+  shellState.tabs.forEach((tab) => {
+    assert(tab.rect, `${tab.label} should exist in wide touch preview.`);
+    assert(tab.rect.left >= 0, `${tab.label} should stay inside the iframe left edge: ${JSON.stringify({ tab, viewport: shellState.viewport })}`);
+    assert(tab.rect.right <= shellState.viewport.width, `${tab.label} should stay inside the iframe right edge: ${JSON.stringify({ tab, viewport: shellState.viewport })}`);
+    assert(tab.rect.bottom <= shellState.viewport.height, `${tab.label} should stay inside the iframe bottom edge: ${JSON.stringify({ tab, viewport: shellState.viewport })}`);
+  });
+
+  await client.send("Emulation.setTouchEmulationEnabled", { enabled: false });
+}
+
+async function runPreviewModeVerification(client) {
+  await client.send("Emulation.setDeviceMetricsOverride", {
+    deviceScaleFactor: 1,
+    height: 1200,
+    mobile: false,
+    width: 1440,
+  });
+
+  await navigate(client, "/");
+  await waitFor(client, `document.querySelector('iframe')?.contentDocument?.body?.innerText.includes('Enter App')`, "preview mode frame");
+
+  const modes = [
+    { label: "Pad", height: 1024, width: 768 },
+    { label: "Wide Pad", height: 768, width: 1024 },
+    { label: "Phone", height: 932, width: 430 },
+  ];
+
+  for (const mode of modes) {
+    await evaluate(client, `[...document.querySelectorAll('button')].find((node) => node.textContent === '${mode.label}')?.click()`);
+    await waitFor(
+      client,
+      `(() => {
+        const frame = document.querySelector('iframe');
+        return frame?.clientWidth === ${mode.width} && frame?.clientHeight === ${mode.height};
+      })()`,
+      `${mode.label} preview dimensions`,
+    );
+    await waitFor(client, `document.querySelector('iframe')?.contentDocument?.body?.innerText.includes('Enter App')`, `${mode.label} preview launch`);
+    await evaluate(client, `document.querySelector('iframe')?.contentDocument?.querySelector('[aria-label="Enter main interface"]')?.click()`);
+    await waitFor(client, `document.querySelector('iframe')?.contentDocument?.body?.innerText.includes('Cash and Holding')`, `${mode.label} preview home`);
+
+    const state = await evaluate(
+      client,
+      `(() => {
+        const frame = document.querySelector('iframe');
+        const doc = frame?.contentDocument;
+        const labels = ['Home tab', 'Invest tab', 'Watchlist tab', 'Discover tab', 'Search tab'];
+        return {
+          frame: frame ? { height: frame.clientHeight, width: frame.clientWidth } : null,
+          tabs: labels.map((label) => {
+            const rect = doc?.querySelector('[aria-label="' + label + '"]')?.getBoundingClientRect();
+            return { label, rect: rect ? { bottom: rect.bottom, height: rect.height, left: rect.left, right: rect.right, top: rect.top, width: rect.width } : null };
+          }),
+        };
+      })()`,
+    );
+
+    assert(state.frame?.width === mode.width && state.frame?.height === mode.height, `${mode.label} should use the requested iframe size: ${JSON.stringify(state.frame)}`);
+    state.tabs.forEach((tab) => {
+      assert(tab.rect, `${mode.label} ${tab.label} should exist.`);
+      assert(tab.rect.width > 24 && tab.rect.height > 24, `${mode.label} ${tab.label} should remain tappable: ${JSON.stringify(tab)}`);
+      assert(tab.rect.left >= 0 && tab.rect.right <= mode.width, `${mode.label} ${tab.label} should stay inside preview width: ${JSON.stringify(tab)}`);
+      assert(tab.rect.bottom <= mode.height, `${mode.label} ${tab.label} should stay inside preview height: ${JSON.stringify(tab)}`);
+    });
+  }
 }
 
 async function main() {
@@ -369,11 +519,14 @@ async function main() {
     client = await connectCdp(page.webSocketDebuggerUrl);
     await runVerification(client);
     await runDesktopNavigationVerification(client);
+    await runWideTouchShellVerification(client);
+    await runPreviewModeVerification(client);
     console.log("Web demo verification passed.");
   } finally {
     client?.close();
     chrome.kill();
-    server?.close();
+    await Promise.race([waitForProcessExit(chrome), sleep(1200)]);
+    await closeServer(server);
     fs.rmSync(userDataDir, { force: true, recursive: true });
   }
 }

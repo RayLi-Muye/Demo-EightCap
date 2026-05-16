@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { Pressable, View, useWindowDimensions } from "react-native";
+import { Pressable, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   Easing,
@@ -12,6 +12,7 @@ import Animated, {
 
 import { showLaunchSplash } from "@/components/launch-splash";
 import { colors, spacing } from "@/design/theme";
+import { useAppViewportDimensions } from "@/hooks/use-app-viewport";
 
 import { HeaderPanelContent, type HeaderPanel } from "./header-panel-content";
 
@@ -28,7 +29,7 @@ export function useHeaderPanelController() {
 export function HeaderPanelProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { width } = useWindowDimensions();
+  const { width } = useAppViewportDimensions();
   const drawerWidth = Math.min(326, Math.max(286, width * 0.82));
   const [activePanel, setActivePanel] = useState<HeaderPanel | null>(null);
   const [inviteCopied, setInviteCopied] = useState(false);

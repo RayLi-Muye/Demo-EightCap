@@ -1,10 +1,10 @@
 import * as Haptics from "expo-haptics";
 import { Link, useLocalSearchParams, useRouter } from "expo-router";
 import Stack from "expo-router/stack";
-import { Activity, BarChart3, ChevronLeft, Ellipsis, PencilLine, Settings, Share2, Star, TrendingDown, TrendingUp } from "lucide-react-native";
+import { Activity, BarChart3, ChevronDown, ChevronLeft, Ellipsis, PencilLine, Settings, Share2, Star, TrendingDown, TrendingUp } from "lucide-react-native";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { Pressable, ScrollView, Text, TextInput, View, useWindowDimensions, type GestureResponderEvent } from "react-native";
-import Animated, { FadeInUp, FadeOutDown } from "react-native-reanimated";
+import { Pressable, ScrollView, Text, TextInput, View, type GestureResponderEvent } from "react-native";
+import Animated, { Easing, FadeInUp, FadeOutDown, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 
 import { AssetLogo } from "@/components/asset-logo";
@@ -21,6 +21,7 @@ import {
   type InstrumentChartRange,
 } from "@/data/portfolio";
 import { colors, radius, shadows, spacing } from "@/design/theme";
+import { useAppViewportDimensions } from "@/hooks/use-app-viewport";
 import { buyPortfolioAsset, sellPortfolioAsset, useDemoAccountSummary, usePortfolioHolding } from "@/hooks/use-demo-portfolio";
 import { useLiveAssets } from "@/hooks/use-live-market";
 import { useWatchlistStatus } from "@/hooks/use-watchlist";
@@ -412,6 +413,7 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
   const initialLimitPrice = roundTradeValue(asset.ask > 0 ? asset.ask : asset.price);
   const priceDigits = initialLimitPrice < 1 ? 4 : 2;
   const [expanded, setExpanded] = useState(false);
+  const [panelVisible, setPanelVisible] = useState(false);
   const [side, setSide] = useState<TradeSide>("buy");
   const [orderType, setOrderType] = useState<OrderType>("market");
   const [quantity, setQuantity] = useState(1);
@@ -419,6 +421,7 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
   const [limitPrice, setLimitPrice] = useState(initialLimitPrice);
   const [limitPriceInput, setLimitPriceInput] = useState(numericInputValue(initialLimitPrice, priceDigits));
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const expandedProgress = useSharedValue(0);
   const hasPosition = Boolean(holding && holding.units > 0);
   const availableUnits = holding?.units ?? 0;
   const buyPrice = asset.ask > 0 ? asset.ask : asset.price;
@@ -434,6 +437,46 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
   const sideAccent = side === "buy" ? colors.brandAction : colors.negative;
   const SubmitIcon = side === "buy" ? TrendingUp : TrendingDown;
   const allocationPercent = maxQuantity > 0 ? quantity / maxQuantity : 0;
+  const bubbleOpacity = useSharedValue(0);
+  const bubbleScale = useSharedValue(0.92);
+  const bubbleY = useSharedValue(-8);
+
+  useEffect(() => {
+    expandedProgress.value = withTiming(expanded ? 1 : 0, {
+      duration: 260,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [expanded, expandedProgress]);
+
+  useEffect(() => {
+    if (expanded) {
+      setPanelVisible(true);
+      bubbleOpacity.value = 0;
+      bubbleScale.value = 0.92;
+      bubbleY.value = -8;
+      bubbleOpacity.value = withTiming(1, { duration: 150, easing: Easing.out(Easing.cubic) });
+      bubbleScale.value = withTiming(1, { duration: 210, easing: Easing.out(Easing.cubic) });
+      bubbleY.value = withTiming(0, { duration: 210, easing: Easing.out(Easing.cubic) });
+      return;
+    }
+
+    bubbleOpacity.value = withTiming(0, { duration: 130, easing: Easing.in(Easing.cubic) });
+    bubbleScale.value = withTiming(0.94, { duration: 150, easing: Easing.in(Easing.cubic) });
+    bubbleY.value = withTiming(-8, { duration: 150, easing: Easing.in(Easing.cubic) }, (finished) => {
+      if (finished) {
+        runOnJS(setPanelVisible)(false);
+      }
+    });
+  }, [bubbleOpacity, bubbleScale, bubbleY, expanded]);
+
+  const expandIconStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${expandedProgress.value * 180}deg` }],
+  }));
+
+  const bubbleStyle = useAnimatedStyle(() => ({
+    opacity: bubbleOpacity.value,
+    transform: [{ translateY: bubbleY.value }, { scale: bubbleScale.value }],
+  }));
 
   useEffect(() => {
     const nextLimitPrice = roundTradeValue(marketPrice);
@@ -538,7 +581,10 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
   }
 
   return (
-    <Animated.View entering={FadeInUp.delay(70).duration(460).springify()} style={{ gap: spacing.sm, paddingHorizontal: spacing.lg }}>
+    <Animated.View
+      entering={FadeInUp.delay(70).duration(460).springify()}
+      style={{ gap: spacing.sm, paddingHorizontal: spacing.lg }}
+    >
       <Pressable
         accessibilityLabel={expanded ? "Hide trade choices" : "Open trade choices"}
         accessibilityRole="button"
@@ -553,32 +599,54 @@ function TradePanel({ asset, holding }: { asset: EquityAsset; holding?: Holding 
           borderRadius: radius.full,
           flexDirection: "row",
           gap: spacing.sm,
-          justifyContent: "center",
+          justifyContent: "space-between",
           minHeight: 60,
           opacity: pressed ? 0.72 : 1,
           paddingHorizontal: spacing.lg,
           transform: [{ scale: pressed ? 0.985 : 1 }],
         })}
       >
-        <Text style={{ color: colors.inverse, fontSize: 19, fontWeight: "600" }}>Trade</Text>
-        <Text style={{ color: "rgba(255,255,255,0.78)", fontSize: 13, fontVariant: ["tabular-nums"], fontWeight: "500" }}>
-          {hasPosition ? `${formatUnits(availableUnits)} units held` : `Bid ${formatPrice(asset.bid)} · Ask ${formatPrice(asset.ask)}`}
-        </Text>
+        <View style={{ alignItems: "center", flex: 1, flexDirection: "row", gap: spacing.sm, justifyContent: "center", minWidth: 0 }}>
+          <Text style={{ color: colors.inverse, fontSize: 19, fontWeight: "600" }}>Trade</Text>
+          <Text numberOfLines={1} style={{ color: "rgba(255,255,255,0.78)", flexShrink: 1, fontSize: 13, fontVariant: ["tabular-nums"], fontWeight: "500" }}>
+            {hasPosition ? `${formatUnits(availableUnits)} units held` : `Bid ${formatPrice(asset.bid)} · Ask ${formatPrice(asset.ask)}`}
+          </Text>
+        </View>
+        <Animated.View style={expandIconStyle}>
+          <ChevronDown color={colors.inverse} size={22} strokeWidth={2.6} />
+        </Animated.View>
       </Pressable>
 
-      {expanded ? (
-        <Animated.View entering={FadeInUp.duration(180)} exiting={FadeOutDown.duration(140)} style={{ gap: spacing.sm }}>
+      {panelVisible ? (
+        <Animated.View style={[{ gap: spacing.sm, paddingTop: 8, transformOrigin: "top center" } as never, bubbleStyle]}>
           <View
             style={{
               ...shadows.card,
-              backgroundColor: "rgba(255,255,255,0.88)",
-              borderColor: "rgba(255,255,255,0.9)",
-              borderRadius: radius.lg,
+              backgroundColor: "rgba(255,255,255,0.94)",
+              borderColor: "rgba(255,255,255,0.94)",
+              borderRadius: 28,
               borderWidth: 1,
+              boxShadow: "0 18px 52px rgba(8, 11, 18, 0.18), inset 0 1px 0 rgba(255,255,255,0.92)",
               gap: spacing.md,
+              overflow: "visible",
               padding: spacing.md,
             }}
           >
+            <View
+              style={{
+                backgroundColor: "rgba(255,255,255,0.94)",
+                borderColor: "rgba(255,255,255,0.94)",
+                borderLeftWidth: 1,
+                borderTopWidth: 1,
+                height: 16,
+                left: "50%",
+                marginLeft: -8,
+                position: "absolute",
+                top: -8,
+                transform: [{ rotate: "45deg" }],
+                width: 16,
+              }}
+            />
             <View
               style={{
                 backgroundColor: "rgba(241,243,239,0.9)",
@@ -828,7 +896,7 @@ function MetricsCarousel({
 
 export default function InstrumentDetailScreen() {
   const params = useLocalSearchParams<{ symbol?: string }>();
-  const { width } = useWindowDimensions();
+  const { width } = useAppViewportDimensions();
   const symbol = Array.isArray(params.symbol) ? params.symbol[0] : params.symbol;
   const baseAsset = symbol ? getAssetBySymbol(symbol) : undefined;
   const sourceAssets = useMemo(() => (baseAsset ? [baseAsset] : []), [baseAsset]);
@@ -895,9 +963,9 @@ export default function InstrumentDetailScreen() {
       <Link.AppleZoomTarget>
         <Animated.View entering={FadeInUp.duration(520).springify()} style={{ gap: spacing.lg }}>
           <View style={{ gap: spacing.md, paddingHorizontal: spacing.lg }}>
-            <View style={{ flexDirection: "row", gap: spacing.md }}>
+            <View style={{ alignItems: "center", flexDirection: "row", gap: spacing.md }}>
               <AssetLogo background={asset.logoBackground} color={asset.logoColor} label={asset.logoLabel} size={58} />
-              <View style={{ flex: 1, minWidth: 0 }}>
+              <View style={{ flex: 1, justifyContent: "center", minWidth: 0 }}>
                 <View style={{ alignItems: "center", flexDirection: "row", flexWrap: "wrap", gap: spacing.sm }}>
                   <Text selectable numberOfLines={1} style={{ color: colors.ink, fontSize: 36, fontWeight: "600", letterSpacing: 0 }}>
                     {asset.symbol}
@@ -915,7 +983,7 @@ export default function InstrumentDetailScreen() {
               </View>
             </View>
 
-            <View style={{ alignItems: "flex-start", gap: spacing.sm }}>
+            <View style={{ alignItems: "center", flexDirection: "row", flexWrap: "wrap", gap: spacing.sm }}>
               <Text selectable style={{ color: colors.ink, fontSize: 36, fontVariant: ["tabular-nums"], fontWeight: "600", letterSpacing: 0 }}>
                 {formatPrice(asset.price)}
               </Text>
@@ -963,12 +1031,6 @@ export default function InstrumentDetailScreen() {
       <TradePanel asset={asset} holding={holding} />
 
       <Animated.View entering={FadeInUp.delay(120).duration(460).springify()} style={{ gap: spacing.md }}>
-        <View style={{ paddingHorizontal: spacing.lg }}>
-          <Text selectable style={{ color: colors.ink, fontSize: 22, fontWeight: "600" }}>
-            Data
-          </Text>
-        </View>
-
         <MetricsCarousel columns={metrics} />
       </Animated.View>
     </ScreenScroll>
