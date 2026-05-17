@@ -20,6 +20,12 @@ type AppHeaderProps = {
 };
 
 const notificationCount = 2;
+const headerGlass = {
+  centerBackground: "rgba(255,255,255,0.22)",
+  centerTint: "rgba(255,255,255,0.36)",
+  iconBackground: "rgba(255,255,255,0.26)",
+  iconTint: "rgba(255,255,255,0.44)",
+};
 
 function hapticTap() {
   Haptics.selectionAsync().catch(() => {});
@@ -47,12 +53,12 @@ function IconButton({ children, label, onPress }: { children: ReactNode; label: 
     >
       <GlassSurface
         interactive
-        intensity={72}
-        tintColor="rgba(255,255,255,0.62)"
+        intensity={62}
+        tintColor={headerGlass.iconTint}
         style={{
           ...shadows.card,
           alignItems: "center",
-          backgroundColor: "rgba(255,255,255,0.42)",
+          backgroundColor: headerGlass.iconBackground,
           borderRadius: radius.full,
           borderWidth: 0,
           height: 48,
@@ -92,11 +98,11 @@ export function AppHeader({ searchPlaceholder, centerLabel, centerSubLabel, rewa
           {searchPlaceholder ? (
             <GlassSurface
               interactive
-              intensity={68}
-              tintColor="rgba(255,255,255,0.48)"
+              intensity={58}
+              tintColor={headerGlass.centerTint}
               style={{
                 alignItems: "center",
-                backgroundColor: "rgba(255,255,255,0.34)",
+                backgroundColor: headerGlass.centerBackground,
                 borderRadius: radius.full,
                 borderWidth: 0,
                 flex: 1,
@@ -113,11 +119,11 @@ export function AppHeader({ searchPlaceholder, centerLabel, centerSubLabel, rewa
           ) : centerLabel ? (
             <GlassSurface
               interactive
-              intensity={68}
-              tintColor="rgba(255,255,255,0.48)"
+              intensity={58}
+              tintColor={headerGlass.centerTint}
               style={{
                 alignItems: "center",
-                backgroundColor: "rgba(255,255,255,0.34)",
+                backgroundColor: headerGlass.centerBackground,
                 borderRadius: radius.full,
                 borderWidth: 0,
                 gap: 1,

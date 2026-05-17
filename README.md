@@ -10,7 +10,6 @@ This is not an official Eightcap product and does not connect to real trading or
 
 - Live demo: https://demo-eightcap.vercel.app
 - GitHub repository: https://github.com/RayLi-Muye/Demo-EightCap
-- Figma wireframe reference: https://www.figma.com/design/CsK2FHAqyu4bmOkiXTmkGp
 
 ## Current Status
 

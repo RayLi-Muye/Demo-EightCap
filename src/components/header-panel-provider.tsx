@@ -21,6 +21,9 @@ type HeaderPanelController = {
 };
 
 const HeaderPanelContext = createContext<HeaderPanelController | null>(null);
+const headerButtonSize = 48;
+const promoArrowSize = 16;
+const promoArrowRight = headerButtonSize / 2 + 2 * (headerButtonSize + spacing.sm) - promoArrowSize / 2;
 
 export function useHeaderPanelController() {
   return useContext(HeaderPanelContext);
@@ -188,10 +191,9 @@ export function HeaderPanelProvider({ children }: { children: ReactNode }) {
                 {
                   alignSelf: "flex-end",
                   backgroundColor: colors.surfaceAlt,
-                  borderColor: "rgba(255,255,255,0.92)",
                   borderRadius: 28,
-                  borderWidth: 1,
-                  boxShadow: "0 18px 52px rgba(8, 11, 18, 0.22), inset 0 1px 0 rgba(255,255,255,0.92)",
+                  borderWidth: 0,
+                  boxShadow: "0 18px 52px rgba(8, 11, 18, 0.22)",
                   marginRight: spacing.lg,
                   marginTop: insets.top + 70,
                   maxWidth: 340,
@@ -204,12 +206,9 @@ export function HeaderPanelProvider({ children }: { children: ReactNode }) {
               <View
                 style={{
                   backgroundColor: colors.surfaceAlt,
-                  borderColor: "rgba(255,255,255,0.92)",
-                  borderLeftWidth: 1,
-                  borderTopWidth: 1,
                   height: 16,
                   position: "absolute",
-                  right: 72,
+                  right: promoArrowRight,
                   top: -8,
                   transform: [{ rotate: "45deg" }],
                   width: 16,

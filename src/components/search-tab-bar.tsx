@@ -52,7 +52,7 @@ export function SearchTabBar({ descriptors, navigation, state }: BottomTabBarPro
   const primaryBarWidth = Math.max(tabWidth - searchButtonSize - spacing.sm, 0);
   const primaryButtonWidth = primaryBarWidth / primaryRouteNames.length;
   const navGlassStyle = {
-    backgroundColor: "rgba(246,249,245,0.46)",
+    backgroundColor: "rgba(246,249,245,0.3)",
     backdropFilter: "blur(24px)",
   };
   const assets = useMemo(uniqueAssets, []);

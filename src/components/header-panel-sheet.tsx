@@ -19,6 +19,10 @@ type HeaderPanelSheetProps = {
   rewardLabel?: string;
 };
 
+const headerButtonSize = 48;
+const promoArrowSize = 16;
+const promoArrowRight = headerButtonSize / 2 + 2 * (headerButtonSize + spacing.sm) - promoArrowSize / 2;
+
 export function HeaderPanelSheet({ onClose, onLogout, panel, rewardLabel }: HeaderPanelSheetProps) {
   const [inviteCopied, setInviteCopied] = useState(false);
   const [activePanel, setActivePanel] = useState<HeaderPanel | null>(panel);
@@ -134,9 +138,9 @@ export function HeaderPanelSheet({ onClose, onLogout, panel, rewardLabel }: Head
               borderBottomRightRadius: isMenu || isPromo ? 28 : 0,
               borderTopLeftRadius: isNotifications ? 28 : isPromo ? 28 : 0,
               borderTopRightRadius: isMenu ? 28 : isPromo ? 28 : 0,
-              borderWidth: 1,
+              borderWidth: isPromo ? 0 : 1,
               boxShadow: isPromo
-                ? "0 18px 52px rgba(8, 11, 18, 0.22), inset 0 1px 0 rgba(255,255,255,0.92)"
+                ? "0 18px 52px rgba(8, 11, 18, 0.22)"
                 : "0 24px 72px rgba(8, 11, 18, 0.24), inset 0 1px 0 rgba(255,255,255,0.92)",
               gap: spacing.lg,
               height: isPromo ? undefined : "100%",
@@ -154,12 +158,9 @@ export function HeaderPanelSheet({ onClose, onLogout, panel, rewardLabel }: Head
             <View
               style={{
                 backgroundColor: colors.surfaceAlt,
-                borderColor: "rgba(255,255,255,0.92)",
-                borderLeftWidth: 1,
-                borderTopWidth: 1,
                 height: 16,
                 position: "absolute",
-                right: 72,
+                right: promoArrowRight,
                 top: -8,
                 transform: [{ rotate: "45deg" }],
                 width: 16,
