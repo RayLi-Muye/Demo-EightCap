@@ -1,6 +1,14 @@
 # Interview Polish Roadmap
 
-This roadmap tracks the remaining work needed to make the EightCap prototype presentation-ready for an interview review link.
+This roadmap tracks the remaining and future work for the public EightCap prototype review link.
+
+## Current Status
+
+- Public demo: https://demo-eightcap.vercel.app
+- Public GitHub repo: https://github.com/RayLi-Muye/Demo-EightCap
+- Current app scope: Home, Invest, Watchlist, Discover, Wallet/Search, and stock/crypto detail pages.
+- Current web preview modes: Phone, Pad, and Wide Pad.
+- Current verification gates: TypeScript, Expo web export, market-data checks, and headless browser smoke testing.
 
 ## Current Recommendation
 
@@ -16,36 +24,44 @@ Use Manrope for web display headings and keep native platforms on system fallbac
 | Inter | Safest all-purpose option | Very readable, but less differentiated |
 | Avenir Next | Good iOS-native feel | Less predictable across Android and web unless carefully configured |
 
+## Completed Polish Passes
+
+- Discover page added with search, themes, Top Movers, and financial business articles.
+- Wallet placeholder actions were replaced with local Deposit, Withdrawal, and Transfer behavior.
+- My Portfolio placeholder balance/deposit UI was removed so wallet logic lives in Wallet.
+- Bottom navigation was split into four primary tabs plus a standalone Search button.
+- Web delivery now uses a Phone/Pad/Wide Pad iframe preview shell.
+- Intro ASCII animation was tuned for phone, tablet portrait, and tablet landscape.
+- Stock detail Trade panel was converted into a Promo-like bubble and the layout morph bug was removed.
+- Vercel deployment is public and GitHub repository visibility is public.
+
 ## Next Implementation Passes
 
-1. **Title System**
-   - Replace remaining major one-off heading styles with shared typography tokens.
-   - Keep page titles black, lighter than the old `900` weight, and avoid decorative letter spacing.
-   - Audit mobile widths so long titles do not collide with header/search actions.
+1. **Landscape Tablet Mode**
+   - Add a dedicated two-column layout for Wide Pad.
+   - Redesign information density for horizontal touch usage.
+   - Decide which panels become persistent and which remain modal/bubble-based.
 
-2. **Discover Depth**
-   - Keep Top Movers in realistic high-volatility ranges where appropriate.
-   - Add stronger differentiation between article cards and market cards.
-   - Consider article filtering by Markets, Business, Digital Assets, and Strategy.
+2. **Dark Mode And Personalization**
+   - Add a dark theme.
+   - Add display settings for user preferences.
+   - Keep financial data legible in both light and dark environments.
 
-3. **Trade Flow**
-   - First pass complete: the Instrument Detail Trade panel now supports Buy/Sell, Market/Limit, quantity stepping, estimated value, available cash, and confirmation feedback.
-   - Sell stays disabled when the asset is not held.
-   - Buy/Sell now updates the demo USD wallet balance as well as portfolio positions.
+3. **Professional Charting**
+   - Add candlestick/K-line charts.
+   - Add trader-focused chart controls.
+   - Consider a proven charting library or a dedicated canvas/SVG implementation.
 
 4. **Wallet Operations**
-   - First pass complete: Deposit, Withdraw, Transfer, and Fund actions now update the demo wallet state instead of acting as placeholders.
-   - Deposit/Fund increase the selected currency account, Withdraw decreases it when funds are available, and Transfer moves a fixed demo amount from the selected account to the next currency account.
-   - Remaining improvement: replace fixed demo amounts with a small amount-entry sheet if the presentation needs a deeper wallet flow.
+   - Replace fixed demo amounts with a small amount-entry sheet if the presentation needs a deeper wallet flow.
+   - Add transaction history if wallet becomes a larger part of the review.
 
 5. **Market Data Consistency**
    - Continue growing `npm run check:market-data` to cover Discover movers, Watch List rows, Portfolio holdings, chart direction, and account totals.
    - Keep Home Cash and Holding equal to Wallet cash plus Portfolio investment value.
 
-6. **Vercel Delivery**
-   - Use `npm run export:web` as the Vercel build command and `dist` as the output directory.
-   - Verify `/`, `/discover`, `/portfolio`, `/watchlist`, `/wallet`, and several `/instrument/:symbol` routes after deployment.
-   - Final email should link to the deployed app and describe it as an interactive EightCap-inspired market and portfolio prototype by Ray Li.
+6. **Figma Refresh**
+   - Bring the Figma file up to date with the shipped Discover, Wallet, Trade bubble, and preview shell modes.
 
 ## Current Verification Gates
 

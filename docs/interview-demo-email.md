@@ -33,7 +33,7 @@ There are a few parts of the project that I am especially proud of:
 1. The intro page ASCII animation. It went through many iterations before reaching the current visual balance and motion.
 2. The complete React Native app workflow built in a short time. The prototype has real local data interaction, five tabs, and interaction depth from the home page down to stock detail menus and order flows.
 3. The responsive adaptation across phone, portrait tablet, and landscape tablet preview modes.
-4. The feedback process. Besides using AI development tooling, I invited friends from the industry to review the prototype, including an experienced trader and a professional QA tester.
+4. The feedback process. Besides using AI development tooling, I invited friends from the industry to review the prototype, including an experienced trader and two professional QA testers.
 5. The automated AI-assisted testing workflow. The project includes a browser smoke test that checks the key routes and interactions.
 
 I also want to thank the friends who reviewed the project and gave me feedback. Their comments helped me focus on the trading experience, interaction polish, and QA details.

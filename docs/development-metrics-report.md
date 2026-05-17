@@ -4,20 +4,22 @@ Date: 2026-05-17
 
 This report records measurable signals from the EightCap prototype build. It separates exact repository data from estimated collaboration metrics.
 
+Snapshot note: repository metrics below reflect the public review state after the app deployment and documentation pass on 2026-05-17.
+
 ## Exact Repository Metrics
 
 | Metric | Value | Source |
 |---|---:|---|
-| Latest shipped commit | `b056193` | `git rev-parse --short HEAD` |
-| Latest commit message | `Refine web preview and trading UI` | `git log` |
-| Files changed in latest shipped commit | 16 | `git show --stat HEAD` |
-| Insertions in latest shipped commit | 674 | `git show --stat HEAD` |
-| Deletions in latest shipped commit | 164 | `git show --stat HEAD` |
-| New files in latest shipped commit | 2 | `src/components/web-phone-preview-shell.tsx`, `src/hooks/use-app-viewport.ts` |
-| Tracked files before this documentation pass | 65 | `git ls-files | wc -l` |
-| App/source TypeScript files before this documentation pass | 43 | `find app src ... | wc -l` |
+| Recent public documentation commit before README refresh | `a20f9ef` | `git rev-parse --short HEAD` |
+| Latest app implementation commit | `b056193` | `git log` |
+| Files changed in latest app implementation commit | 16 | `git show --stat b056193` |
+| Insertions in latest app implementation commit | 674 | `git show --stat b056193` |
+| Deletions in latest app implementation commit | 164 | `git show --stat b056193` |
+| New files in latest app implementation commit | 2 | `src/components/web-phone-preview-shell.tsx`, `src/hooks/use-app-viewport.ts` |
+| Tracked files before README refresh | 68 | `git ls-files | wc -l` |
+| App/source TypeScript files before README refresh | 43 | `find app src ... | wc -l` |
 | Main verification script length | 538 lines | `scripts/verify-web-demo.cjs` |
-| Main app/source/doc/script line count snapshot | 8171 lines | `wc -l` snapshot before this doc pass |
+| Main app/source/doc/script line count snapshot | 9106 lines | `wc -l` snapshot before README refresh |
 
 ## Validation Metrics
 
@@ -26,9 +28,10 @@ This report records measurable signals from the EightCap prototype build. It sep
 | TypeScript | Passed with `npm run typecheck` |
 | Expo web export | Passed with `npm run export:web` |
 | Local smoke test | Passed with `npm run verify:web-demo` |
-| Production smoke test | Passed with `VERIFY_WEB_BASE_URL=https://demo-eightcap-4imt45ymj-rays-projects-f956e95b.vercel.app npm run verify:web-demo` |
+| Production smoke test | Passed with `VERIFY_WEB_BASE_URL=https://demo-eightcap.vercel.app npm run verify:web-demo` and the deployment URL smoke test |
 | Production HTTP status | `200` after disabling Vercel SSO protection |
 | Vercel deployment state | `READY` |
+| GitHub repository visibility | `PUBLIC` |
 
 ## Prompt And Command Frequency
 
@@ -74,3 +77,4 @@ For interview discussion, present this honestly: the development process was ins
 
 - Production: https://demo-eightcap.vercel.app
 - Deployment: https://demo-eightcap-4imt45ymj-rays-projects-f956e95b.vercel.app
+- GitHub: https://github.com/RayLi-Muye/Demo-EightCap

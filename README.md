@@ -1,21 +1,117 @@
-# Eightcap Market Demo
+# Eightcap React Native Prototype
 
-React Native / Expo demonstration project for a mobile-first market browsing experience inspired by Eightcap's public website.
+An interview demonstration project by Ray Li.
 
-This repository is being prepared as an interview demonstration. The app will use mock market data so the work can focus on interaction quality, visual execution, responsive layout, and project communication.
+This is a React Native / Expo prototype for a mobile-first trading experience inspired by the public Eightcap website. It uses mock market, wallet, watchlist, and portfolio data so the focus can stay on frontend craft, interaction depth, responsive behavior, and the AI-assisted development workflow.
+
+This is not an official Eightcap product and does not connect to real trading or brokerage services.
+
+## Links
+
+- Live demo: https://demo-eightcap.vercel.app
+- GitHub repository: https://github.com/RayLi-Muye/Demo-EightCap
+- Figma wireframe reference: https://www.figma.com/design/CsK2FHAqyu4bmOkiXTmkGp
 
 ## Current Status
 
-- Repository scaffold: created and pushed to private GitHub repo
-- Design brief: drafted in `docs/eightcap-mobile-demo-brief.md`
-- Figma wireframes: created in `Eightcap Market Demo - Wireframes`, with basic prototype navigation wired
-- Prompt and command log: started in `docs/prompt-command-log.md`
-- App implementation: Tradle-inspired four-tab account experience is running locally
-- SDK baseline: upgraded to Expo SDK 55 stable
-- Navigation polish: SDK 55 native tabs are used on iOS/Android for system tab behavior, with a glassy blur fallback for web demo links
-- Motion system: mocked market data streams drive live quote flashes, animated index ticker, haptics, launch animation, and detail-page zoom transitions
-- Data source: local mock data only
-- API routes: intentionally not used in this phase
+- Repository visibility: public for interview review
+- Deployment: Vercel Git Integration from `main`
+- Framework: Expo SDK 55, React Native 0.83, React 19
+- Routing: Expo Router file-based routes
+- Data: local mock data and local state only
+- Verification: TypeScript, Expo web export, and headless browser smoke testing
+- Public demo access: Vercel SSO deployment protection disabled
+
+## Product Scope
+
+The prototype includes five primary app surfaces:
+
+1. Home
+   - Cash and Holding
+   - animated market chart
+   - Top Movers
+   - market movement UI
+
+2. Invest
+   - portfolio asset list
+   - holding rows
+   - market values and P/L data
+
+3. Watchlist
+   - watchlist table
+   - bid/ask quote display
+   - market filters
+
+4. Discover
+   - search
+   - trending themes
+   - Top Movers
+   - financial business article section
+
+5. Search / Wallet
+   - bottom navigation Search action
+   - Wallet currency accounts
+   - Deposit, Withdrawal, and Transfer actions
+
+The app also includes stock/crypto detail pages with chart range controls, contextual menus, a Promo-like trade ticket bubble, Buy/Sell behavior, and local portfolio/wallet updates.
+
+## Preview Modes
+
+The deployed web app includes an outer preview shell so reviewers can inspect the app without browser devtools:
+
+| Mode | Viewport |
+|---|---:|
+| Phone | `430 x 932` |
+| Pad | `768 x 1024` |
+| Wide Pad | `1024 x 768` |
+
+The shell renders the app inside an iframe with a real viewport. This avoids the layout issues caused by simply scaling the React Native Web root with CSS.
+
+## Visual Direction
+
+The visual direction references the main visual language of the public Eightcap website. The theme uses the green from the Eightcap logo as the primary action/accent color, paired with near-white surfaces, black typography, and red/green market movement states.
+
+The intro page includes a custom ASCII animation that was iterated many times to create a memorable first impression for the demo.
+
+## Tech Stack
+
+| Area | Technology |
+|---|---|
+| App framework | Expo SDK 55 |
+| UI | React Native 0.83, React 19 |
+| Web | React Native Web |
+| Routing | Expo Router |
+| Animation | React Native Reanimated |
+| Icons | `lucide-react-native` |
+| Graphics | `react-native-svg` |
+| Native feel | `expo-haptics`, `expo-blur`, `expo-glass-effect`, `expo-symbols` |
+| Deployment | Vercel |
+| Automation | custom headless Chrome smoke test |
+
+## Repository Structure
+
+```text
+.
+├── app/                         Expo Router screens
+│   ├── (tabs)/                  Home, Invest, Watchlist, Discover, Wallet/Search
+│   ├── instrument/[symbol].tsx  stock/crypto detail route
+│   ├── +html.tsx                web HTML shell
+│   └── _layout.tsx              root stack and preview shell wrapper
+├── assets/                      fonts and Expo assets
+├── docs/                        briefs, metrics, technical notes, email copy
+├── scripts/
+│   ├── check-market-data.cjs
+│   └── verify-web-demo.cjs      headless browser smoke test
+├── src/
+│   ├── components/              reusable UI components
+│   ├── data/                    mock market/portfolio data
+│   ├── design/                  design tokens
+│   ├── hooks/                   local portfolio, viewport, live-market hooks
+│   └── utils/                   formatting helpers
+├── package.json
+├── tsconfig.json
+└── vercel.json
+```
 
 ## Run Locally
 
@@ -24,82 +120,79 @@ npm install
 npm run web
 ```
 
-The current dev server was verified at:
+The local app runs at:
 
 ```text
-http://localhost:8082
+http://localhost:8081
 ```
 
-Port `8081` was already occupied on this machine, so `8082` was used for verification.
-
-## Presentation Format
-
-The strongest interview package should include:
-
-1. A live web demo link generated from the Expo web build and deployed to Vercel.
-2. A Figma prototype link showing the mobile wireframes and visual system: https://www.figma.com/design/CsK2FHAqyu4bmOkiXTmkGp
-3. This GitHub repository link for code review.
-4. A short case-study note in the email explaining scope, tradeoffs, and what is mocked.
-
-For a React Native project, the live web demo is the easiest link for reviewers to open from email. Expo Go can be offered as a secondary option, but it adds friction for non-technical reviewers.
-
-## Source Reference
-
-Primary brand and IA reference: https://www.eightcap.com/en/traders/
-
-This is a portfolio demo only. It should be described as "inspired by Eightcap's public trading website" and should not imply affiliation with Eightcap.
-
-## Repository Structure
+Useful preview URLs:
 
 ```text
-.
-├── app/                    Expo Router screens
-│   ├── (tabs)/             Home, Portfolio, Watchlist, Wallet
-│   │   └── _layout.native.tsx
-│   │                       NativeTabs layout for iOS/Android
-│   ├── instrument/         Dynamic instrument detail route
-│   └── disclaimer.tsx      Secondary project boundary note
-├── assets/                 Expo app assets
-├── src/
-│   ├── components/         Reusable UI components
-│   ├── data/               Mock market data
-│   ├── design/             Design tokens
-│   └── utils/              Formatting helpers
-├── README.md
-├── docs/
-│   ├── eightcap-mobile-demo-brief.md
-│   ├── figma-wireframe-brief.md
-│   └── prompt-command-log.md
-├── package.json
-├── tsconfig.json
-└── .gitignore
+http://localhost:8081/
+http://localhost:8081/?previewMode=pad
+http://localhost:8081/?previewMode=widePad
+http://localhost:8081/instrument/NVDA
 ```
-
-## Implemented Screens
-
-- Home tab with active account value, day movement, market curve, movers card, and index strip.
-- My Investments tab with portfolio filters, holding rows, P/L, net value, and deposit CTA.
-- Watchlist tab with search, chips, quote table, bid/ask capsules, and add CTA.
-- Wallet tab with total value, currency selector, account balances, and transfer/deposit actions.
-- Instrument detail route with chart range controls, bid/ask stats, spread, and market state.
-- Bottom navigation with native tab treatment on mobile and a translucent blur treatment on web.
-- Realtime-style mock updates across Home, My Investments, Watchlist, and Instrument Detail.
 
 ## Verification
 
+Core checks:
+
 ```bash
 npm run typecheck
-npx expo export --platform web
+npm run export:web
+npm run verify:web-demo
 ```
 
-Browser verification covered:
+Production smoke test:
 
-- `http://localhost:8082/`
-- `http://localhost:8082/portfolio`
-- `http://localhost:8082/watchlist`
-- `http://localhost:8082/wallet`
-- `http://localhost:8082/instrument/NVDA`
+```bash
+VERIFY_WEB_BASE_URL=https://demo-eightcap.vercel.app npm run verify:web-demo
+```
 
-Static web export was also verified and generated `dist/`, which is ignored by Git and can be used as the Vercel output later.
+The smoke test covers:
 
-`vercel.json` is included so Vercel can run the Expo web export and serve dynamic instrument detail URLs.
+- launch splash and enter flow
+- Discover page
+- Wallet deposit and transfer
+- instrument detail trade order
+- portfolio update after buy
+- sell disabled when no holding exists
+- Watchlist route
+- desktop iframe shell
+- Phone, Pad, and Wide Pad preview modes
+
+## Documentation
+
+- [Mobile demo brief](docs/eightcap-mobile-demo-brief.md)
+- [Figma wireframe brief](docs/figma-wireframe-brief.md)
+- [Interview polish roadmap](docs/interview-polish-roadmap.md)
+- [Prompt and command log](docs/prompt-command-log.md)
+- [Development metrics report](docs/development-metrics-report.md)
+- [Technical implementation notes](docs/technical-implementation-notes.md)
+- [Interview demo email](docs/interview-demo-email.md)
+
+## Development Workflow
+
+The project was built iteratively with an AI-assisted workflow:
+
+- Figma Make and Figma references for visual exploration
+- Codex skills such as `$figma:figma-use`, `$grill-me`, and `$grill-with-docs`
+- parallel agent workstreams for implementation, investigation, and validation
+- repeated local browser review
+- automated smoke tests through `scripts/verify-web-demo.cjs`
+- GitHub and Vercel integration for public review
+
+## Future Priorities
+
+1. Dedicated landscape tablet mode with a two-column layout and touch-optimized information density.
+2. Dark mode and more personalization settings.
+3. Professional trader charting, especially candlestick/K-line chart views.
+
+## Notes
+
+- All market and account data is mocked.
+- No real trading orders are sent.
+- No API secrets or private account data are stored in the repository.
+- `package.json` remains marked `private` to prevent accidental npm publishing; this is independent of the GitHub repository visibility.

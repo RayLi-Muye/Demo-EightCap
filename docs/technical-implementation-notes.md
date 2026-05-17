@@ -26,7 +26,7 @@ This document summarizes the technical design of the EightCap prototype for inte
 | `app/(tabs)/portfolio.tsx` | Portfolio asset list |
 | `app/(tabs)/watchlist.tsx` | Watch List |
 | `app/(tabs)/discover.tsx` | Discover, Top Movers, themes, business articles |
-| `app/(tabs)/wallet.tsx` | Wallet and currency accounts |
+| `app/(tabs)/wallet.tsx` | Wallet, currency accounts, and the standalone bottom Search route |
 | `app/instrument/[symbol].tsx` | Stock or crypto detail page with trade ticket |
 | `app/disclaimer.tsx` | Demo notice |
 
@@ -131,23 +131,32 @@ The smoke test covers:
 The project is deployed through Vercel Git Integration.
 
 - GitHub repo: `RayLi-Muye/Demo-EightCap`
+- GitHub URL: https://github.com/RayLi-Muye/Demo-EightCap
 - Branch: `main`
 - Vercel project: `demo-eightcap`
 - Production URL: https://demo-eightcap.vercel.app
 
 SSO deployment protection was disabled so interview reviewers can open the public link without logging into Vercel.
 
+## Design And AI Workflow
+
+- The visual direction references the public Eightcap website and uses the green from the Eightcap logo as the primary theme color.
+- Figma Make and Figma references were used during design exploration, especially for Discover and navigation direction.
+- Codex skills and workflows used during the project included `$figma:figma-use`, `$grill-me`, `$grill-with-docs`, Browser/in-app browser verification, GitHub publishing, and Vercel deployment.
+- Parallel AI agent workstreams were used to accelerate implementation, investigation, documentation, and verification.
+
 ## Maintenance Plan
 
 Recommended maintenance approach:
 
-1. Keep `main` as the stable demo branch.
+1. Keep `main` as the stable public demo branch.
 2. Use short feature branches for future polish work.
 3. Run `npm run typecheck`, `npm run export:web`, and `npm run verify:web-demo` before pushing.
 4. Keep mock data centralized in `src/data/portfolio.ts`.
 5. Keep reusable UI behavior in `src/components` and avoid one-off styles inside routes when a pattern repeats.
 6. Update `docs/prompt-command-log.md` after major prompt-driven changes.
 7. Add a short changelog entry for every deployment sent to reviewers.
+8. Keep the repository public while it is being used for interview review.
 
 ## Public Repo And Interview Code Access
 

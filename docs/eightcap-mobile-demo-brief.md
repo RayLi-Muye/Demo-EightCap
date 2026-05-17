@@ -12,8 +12,10 @@ Implementation update:
 
 - Keep the visible app experience closer to a real in-use account product. Avoid repeated on-screen explanations that the build is a demo.
 - Preserve Eightcap's homepage color logic: white/near-white canvas, strong black typography, bright green accent, light gray controls, and red/green market movement.
-- Use the provided Tradle iPhone references for structure and density: home, my investments, watchlist, and wallet balance.
+- Use the provided mobile trading references for structure and density: Home, Invest, Watchlist, Discover, Wallet/Search, and stock detail flows.
 - Use English as the product UI baseline for all future implementation and design iterations.
+- The current deployed web demo includes Phone, Pad, and Wide Pad iframe preview modes so reviewers do not need browser devtools.
+- The GitHub repository is public for interview review.
 
 ## Reference Signals From Eightcap
 
@@ -63,7 +65,7 @@ Primary reviewer impression:
    - Movers card with vertical bars.
    - Compact market index strip.
 
-2. My Investments
+2. Invest
    - Portfolio total in the header.
    - Filter chips: pending orders, trades, open, stocks.
    - Holding rows with price, movement, P/L, and net value.
@@ -76,29 +78,36 @@ Primary reviewer impression:
    - Bid/ask quote table.
    - Floating add CTA.
 
-4. Wallet Balance
-   - Total value card and currency selector.
-   - Funding prompt card.
-   - USD/AUD/GBP account rows.
-   - Deposit and transfer actions.
+4. Discover
+   - Search.
+   - Trending themes.
+   - Top Movers.
+   - Financial business article cards.
 
-5. Instrument Detail
+5. Wallet / Search
+   - Standalone bottom Search action.
+   - Wallet currency accounts.
+   - Deposit, Withdrawal, and Transfer actions.
+
+6. Instrument Detail
    - Symbol, price, percentage move, bid/ask, spread, and market status.
-   - Range selector: 1D, 1W, 1M, 3M.
-   - Green/red area chart.
+   - Range selector: 1D, 1W, 1M, 3M, 1Y.
+   - Green/red chart.
+   - Contextual menu.
+   - Promo-like Trade bubble with Buy/Sell, Market/Limit, quantity, value, available cash, and local confirmation behavior.
 
 ## Mock Data Model
 
 Each instrument should include:
 
-- `symbol`: XAUUSD, EURUSD, GER40, NDX100, US30, USOUSD, USDCHF, GBPUSD, BTCUSD.
-- `displayName`: Gold vs US Dollar, Euro / US Dollar, Nasdaq 100, etc.
-- `category`: forex, index, commodity, crypto.
+- `symbol`: stock and crypto symbols such as NVDA, SOL, META, BTC, ETH, AAPL, TSLA, and others.
+- `displayName`: NVIDIA, Solana, Meta Platforms, Bitcoin, etc.
+- `category`: stock, crypto, index, and related market categories.
 - `price`: mocked current value.
 - `change`: numeric absolute change.
 - `changePercent`: numeric percent change.
-- `spreadRaw`: mocked raw spread.
-- `spreadStandard`: mocked standard spread.
+- `bid` / `ask`: mocked quote values.
+- `assetClass`: stock or crypto.
 - `leverage`: display string, for example `1:500`.
 - `sparkline`: 20-40 local numeric values.
 - `sentiment`: bullish, neutral, bearish.
@@ -142,12 +151,14 @@ Target breakpoints and frames:
 - Small phone: 375 x 667.
 - Standard phone: 390 x 844.
 - Large phone: 430 x 932.
-- Tablet/web preview: 768 px and above.
+- Large phone preview: 430 x 932.
+- Pad preview: 768 x 1024.
+- Wide Pad preview: 1024 x 768.
 
 Behavior:
 
 - Mobile should be the primary layout.
-- Tablet/web should center content in a phone-like readable column with optional side panels, not stretch rows across the full screen.
+- Desktop web should use the iframe preview shell so the app sees a real Phone, Pad, or Wide Pad viewport.
 - Avoid tiny tap targets; keep primary touch targets at least 44 px.
 - Use scrollable content with safe-area handling.
 
@@ -171,14 +182,14 @@ Expo Router 7 / SDK 55 direction:
 - Stack Toolbar and Apple Zoom transitions should be used where they strengthen the native app feel: asset rows into instrument detail and detail-page header actions.
 - Material 3 direction should show through Android native tab indicator/ripple colors and consistent green status tokens.
 - Data Loaders / SSR and Split View are follow-up architecture items. They are not required while market data is deterministic and local.
-- Keep the current app focused on the four product tabs, instrument detail route, visual polish, and reliable web deployment.
+- Keep the current app focused on the five product surfaces, instrument detail route, visual polish, and reliable web deployment.
 - For interview delivery, explain that web receives a blur fallback while native builds can use platform-native tab rendering.
 
 Motion / realtime mock direction:
 
 - Home: account value and chart should shift subtly while the index strip loops horizontally.
 - Watchlist: update two to three quote rows every few seconds; flash green for upticks and red for downticks.
-- My Investments: update fewer rows at a slower cadence so the portfolio still feels readable.
+- Invest: update fewer rows at a slower cadence so the portfolio still feels readable.
 - Wallet: keep balances stable; use glass surfaces, card entry motion, and haptic CTA feedback instead of changing money values.
 - Instrument Detail: update the selected asset more frequently, animate chart values, and support Apple Zoom transition from asset rows.
 
@@ -210,6 +221,11 @@ Best email package:
   - Eightcap-inspired visual research
   - highlights: chart UI, adaptive layout, documented prompt/command workflow
 
+Current public links:
+
+- Live demo: https://demo-eightcap.vercel.app
+- GitHub: https://github.com/RayLi-Muye/Demo-EightCap
+
 Secondary options:
 
 - Expo Go QR code for mobile review.
@@ -217,7 +233,7 @@ Secondary options:
 
 ## Open Decisions
 
-- Final repo visibility: initially private during build; public for interview review.
+- Final repo visibility: public for interview review.
 - Whether the deployed app should use a neutral name like `Market Pulse Demo` to avoid brand confusion.
 - Whether to include generated visual assets or use abstract chart/product visuals.
 - Whether to keep the custom SVG sparkline or adopt a chart library for richer interactions later.

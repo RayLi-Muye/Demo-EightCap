@@ -14,6 +14,7 @@ This section reorganizes the recent collaboration into skills and command usage.
 
 | Skill or workflow | How it was used |
 |---|---|
+| Figma Make | Used for visual/design exploration and to support the Discover/navigation direction. |
 | `$figma:figma-use` | Inspect and translate Figma direction, especially the Discover page and top navigation work. |
 | `$grill-me` | Stress-test plans and turn broad feedback into decision points. |
 | `$grill-with-docs` | Diagnose layout issues against the existing project and documentation assumptions. |
@@ -47,6 +48,10 @@ git push origin main
 vercel ls --format json --scope rays-projects-f956e95b
 vercel project protection disable demo-eightcap --sso --scope rays-projects-f956e95b
 VERIFY_WEB_BASE_URL=https://demo-eightcap-4imt45ymj-rays-projects-f956e95b.vercel.app npm run verify:web-demo
+gh repo edit RayLi-Muye/Demo-EightCap --visibility public --accept-visibility-change-consequences
+git commit -m "Update interview documentation"
+git commit -m "Clarify Eightcap visual reference"
+git commit -m "Add workflow appendix to interview email"
 ```
 
 ## Initial User Prompt

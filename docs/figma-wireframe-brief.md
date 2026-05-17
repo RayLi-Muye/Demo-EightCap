@@ -11,8 +11,9 @@ Use this document as the starting point for Figma wireframes and a clickable pro
 - File name: `Eightcap Market Demo - Wireframes`
 - URL: https://www.figma.com/design/CsK2FHAqyu4bmOkiXTmkGp
 - Pages: `00 Cover`, `01 Wireframes`, `02 Components`
-- Status: mobile-first wireframes created, basic prototype navigation wired, and visually checked against standard phone and tablet-web preview frames.
-- Follow-up: the code implementation has since shifted toward a Tradle-inspired four-tab account app: Home, My Investments, Watchlist, and Wallet. The Figma wireframe should be revised in the next design pass to match this IA.
+- Status: original mobile-first wireframes created, basic prototype navigation wired, and visually checked against standard phone and tablet-web preview frames.
+- Current implementation note: the shipped code has moved beyond the first wireframe set into a five-surface React Native prototype: Home, Invest, Watchlist, Discover, and Wallet/Search, plus stock/crypto detail pages.
+- Follow-up: revise the Figma file in the next design pass to match the deployed Phone, Pad, and Wide Pad preview modes.
 
 ## Frames
 
@@ -23,6 +24,15 @@ Use this document as the starting point for Figma wireframes and a clickable pro
 - `05 Disclaimer / iPhone 15`
 - `06 Market Home / Small Phone`
 - `07 Market Home / Tablet-Web Preview`
+
+Current implementation frames to add in the next Figma pass:
+
+- `08 Discover / iPhone`
+- `09 Wallet / iPhone`
+- `10 Stock Detail / Trade Bubble`
+- `11 Phone Preview Shell / Web`
+- `12 Pad Portrait Preview / Web`
+- `13 Wide Pad Preview / Web`
 
 ## Created Component References
 
@@ -65,13 +75,15 @@ Use this document as the starting point for Figma wireframes and a clickable pro
 
 ## Prototype Flow
 
-1. Open Market Home.
-2. Tap XAUUSD or EURUSD.
-3. View instrument detail.
-4. Change time range.
-5. Add/remove from watchlist.
-6. Open Insights.
-7. Open Disclaimer.
+1. Open Home.
+2. Enter the app from the ASCII intro.
+3. Navigate between Home, Invest, Watchlist, Discover, and Search/Wallet.
+4. Open an asset detail page.
+5. Change the chart range.
+6. Open the contextual detail menu.
+7. Open the Trade bubble.
+8. Simulate a Buy/Sell flow.
+9. Return to Portfolio or Wallet to see local state changes.
 
 Implemented prototype links:
 
@@ -79,7 +91,12 @@ Implemented prototype links:
 - Watchlist row `XAUUSD` navigates to Instrument Detail.
 - Header info icons navigate to Disclaimer.
 - Disclaimer CTA returns to Market Home.
-- Bottom tab hotspots navigate between Markets, Watchlist, and Insights.
+- Bottom tab hotspots navigate between Markets, Watchlist, and Insights in the original wireframe.
+
+Current implementation references:
+
+- Live demo: https://demo-eightcap.vercel.app
+- Public GitHub repo: https://github.com/RayLi-Muye/Demo-EightCap
 
 ## Copy Guidelines
 
