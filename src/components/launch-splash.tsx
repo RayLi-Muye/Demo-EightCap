@@ -14,6 +14,8 @@ import { useAppViewportDimensions } from "@/hooks/use-app-viewport";
 const ASCII_COLUMNS = 82;
 const ASCII_ROWS = 50;
 const BRAND_GREEN = "#2DBB69";
+const PHONE_ASCII_SCALE_ADJUSTMENT = 0.95;
+const PHONE_ASCII_OFFSET_Y_ADJUSTMENT = 0.05;
 
 type SplashRequest = {
   autoHide: boolean;
@@ -171,10 +173,14 @@ export function LaunchSplash() {
         ? clamp(Math.min(height * 0.012, width * 0.013), 9, 11.5)
       : clamp(Math.min(height * 0.018, width * 0.018), 12, 16);
   const baseStageScale = isPhone ? (width < 390 ? 0.88 : 0.98) : isTablet ? 1.32 : 1.56;
-  const stageScale = isPhone ? baseStageScale * 1.5 : isTablet && !isTabletLandscape ? baseStageScale * 1.375 : baseStageScale;
+  const stageScale = isPhone
+    ? baseStageScale * 1.5 * PHONE_ASCII_SCALE_ADJUSTMENT
+    : isTablet && !isTabletLandscape
+      ? baseStageScale * 1.375
+      : baseStageScale;
   const stageOffsetX = 0;
   const baseStageOffsetY = (isPhone ? height * 0.035 : isTablet ? height * (isTabletLandscape ? 0.01 : -0.02) : width >= 1100 ? 72 : 0) - height * 0.05;
-  const stageOffsetY = baseStageOffsetY + (isTablet ? height * (isTabletLandscape ? 0.05 : 0.1) : 0);
+  const stageOffsetY = baseStageOffsetY + (isPhone ? height * PHONE_ASCII_OFFSET_Y_ADJUSTMENT : isTablet ? height * (isTabletLandscape ? 0.05 : 0.1) : 0);
   const asciiTextWidth = ASCII_COLUMNS * (asciiFontSize + 2);
   const asciiTextHeight = ASCII_ROWS * asciiFontSize * 1.1;
 
