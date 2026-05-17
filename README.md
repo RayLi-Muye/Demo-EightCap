@@ -9,7 +9,6 @@ This is not an official Eightcap product and does not connect to real trading or
 ## Links
 
 - Live demo: https://demo-eightcap.vercel.app
-- GitHub repository: https://github.com/RayLi-Muye/Demo-EightCap
 
 ## Current Status
 
