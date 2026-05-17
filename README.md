@@ -1,8 +1,8 @@
-# Eightcap React Native Prototype
+# React Native Interview Demo
 
 An interview demonstration project by Ray Li.
 
-This is a React Native / Expo prototype for a mobile-first trading experience inspired by the public Eightcap website. It uses mock market, wallet, watchlist, and portfolio data so the focus can stay on frontend craft, interaction depth, responsive behavior, and the AI-assisted development workflow.
+This is a React Native / Expo prototype built as an interview demonstration for a mobile-first trading experience. It uses mock market, wallet, watchlist, and portfolio data so the focus can stay on frontend craft, interaction depth, responsive behavior, and the AI-assisted development workflow.
 
 This is not an official Eightcap product and does not connect to real trading or brokerage services.
 
@@ -68,7 +68,7 @@ The shell renders the app inside an iframe with a real viewport. This avoids the
 
 ## Visual Direction
 
-The visual direction references the main visual language of the public Eightcap website. The theme uses the green from the Eightcap logo as the primary action/accent color, paired with near-white surfaces, black typography, and red/green market movement states.
+The visual direction was prepared for the interview demonstration and uses a green primary action/accent color, paired with near-white surfaces, black typography, and red/green market movement states.
 
 The intro page includes a custom ASCII animation that was iterated many times to create a memorable first impression for the demo.
 
