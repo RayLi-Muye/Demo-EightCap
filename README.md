@@ -8,7 +8,7 @@ This is not an official brokerage product and does not connect to real trading o
 
 ## Links
 
-- Live demo: <your-vercel-url>
+- Live demo: https://demo-trading-reactnative-ray.vercel.app/
 
 ## Current Status
 
